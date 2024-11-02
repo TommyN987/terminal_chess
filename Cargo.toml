@@ -1,0 +1,11 @@
+[workspace]
+members = [
+    "domain", 
+    "tui", 
+    "server", 
+    "protocol",
+]
+resolver = "2"
+
+[workspace.dependencies]
+derive-new = "0.7.0"
