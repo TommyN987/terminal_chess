@@ -1,10 +1,7 @@
+use crate::Color;
+
 pub struct Player {
     color: Color,
-}
-
-pub enum Color {
-    White,
-    Black,
 }
 
 impl Player {

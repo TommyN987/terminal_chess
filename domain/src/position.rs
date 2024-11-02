@@ -2,7 +2,7 @@ use std::ops::Add;
 
 use derive_new::new;
 
-use crate::{direction::Direction, player::Color};
+use crate::{direction::Direction, Color};
 
 #[derive(Debug, Copy, Clone, PartialEq, Hash, new)]
 pub struct Position {
