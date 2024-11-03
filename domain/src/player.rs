@@ -4,7 +4,7 @@ use crate::Color;
 
 #[derive(Debug, Clone, PartialEq, new)]
 pub struct Player {
-    color: Color,
+    pub color: Color,
 }
 
 impl Player {

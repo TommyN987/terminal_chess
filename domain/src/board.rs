@@ -1,5 +1,6 @@
 use crate::{
-    pieces::{Piece, PieceType},
+    direction::Direction,
+    pieces::{Bishop, King, Knight, Pawn, Piece, PieceType, Queen, Rook},
     position::Position,
     Color,
 };
@@ -33,79 +34,85 @@ impl Board {
     fn add_starting_pieces(&mut self) {
         self.set(
             &Position::new(0, 0),
-            Some(Piece::new(PieceType::Rook, Color::Black)),
+            Some(Piece::new(PieceType::Rook(Rook::new()), Color::Black)),
         );
         self.set(
             &Position::new(0, 1),
-            Some(Piece::new(PieceType::Knight, Color::Black)),
+            Some(Piece::new(PieceType::Knight(Knight), Color::Black)),
         );
         self.set(
             &Position::new(0, 2),
-            Some(Piece::new(PieceType::Bishop, Color::Black)),
+            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::Black)),
         );
         self.set(
             &Position::new(0, 3),
-            Some(Piece::new(PieceType::Queen, Color::Black)),
+            Some(Piece::new(PieceType::Queen(Queen::new()), Color::Black)),
         );
         self.set(
             &Position::new(0, 4),
-            Some(Piece::new(PieceType::King, Color::Black)),
+            Some(Piece::new(PieceType::King(King::new()), Color::Black)),
         );
         self.set(
             &Position::new(0, 5),
-            Some(Piece::new(PieceType::Bishop, Color::Black)),
+            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::Black)),
         );
         self.set(
             &Position::new(0, 6),
-            Some(Piece::new(PieceType::Knight, Color::Black)),
+            Some(Piece::new(PieceType::Knight(Knight), Color::Black)),
         );
         self.set(
             &Position::new(0, 7),
-            Some(Piece::new(PieceType::Rook, Color::Black)),
+            Some(Piece::new(PieceType::Rook(Rook::new()), Color::Black)),
         );
 
         for i in 0..=7 {
             self.set(
                 &Position::new(1, i),
-                Some(Piece::new(PieceType::Pawn, Color::Black)),
+                Some(Piece::new(
+                    PieceType::Pawn(Pawn::new(Direction::South)),
+                    Color::Black,
+                )),
             );
             self.set(
                 &Position::new(6, i),
-                Some(Piece::new(PieceType::Pawn, Color::White)),
+                Some(Piece::new(
+                    PieceType::Pawn(Pawn::new(Direction::North)),
+                    Color::White,
+                )),
             );
         }
 
         self.set(
             &Position::new(7, 0),
-            Some(Piece::new(PieceType::Rook, Color::White)),
+            Some(Piece::new(PieceType::Rook(Rook::new()), Color::White)),
         );
         self.set(
             &Position::new(7, 1),
-            Some(Piece::new(PieceType::Knight, Color::White)),
+            Some(Piece::new(PieceType::Knight(Knight), Color::White)),
         );
         self.set(
             &Position::new(7, 2),
-            Some(Piece::new(PieceType::Bishop, Color::White)),
+            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::White)),
         );
         self.set(
             &Position::new(7, 3),
-            Some(Piece::new(PieceType::Queen, Color::White)),
+            Some(Piece::new(PieceType::Queen(Queen::new()), Color::White)),
         );
         self.set(
             &Position::new(7, 4),
-            Some(Piece::new(PieceType::King, Color::White)),
+            Some(Piece::new(PieceType::King(King::new()), Color::White)),
         );
         self.set(
             &Position::new(7, 5),
-            Some(Piece::new(PieceType::Bishop, Color::White)),
+            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::White)),
         );
         self.set(
             &Position::new(7, 6),
-            Some(Piece::new(PieceType::Knight, Color::White)),
+            Some(Piece::new(PieceType::Knight(Knight), Color::White)),
         );
         self.set(
             &Position::new(7, 7),
-            Some(Piece::new(PieceType::Rook, Color::White)),
+            Some(Piece::new(PieceType::Rook(Rook::new()), Color::White)),
         );
     }
 }

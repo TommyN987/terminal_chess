@@ -1,6 +1,6 @@
 use std::ops::{Add, Mul};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Direction {
     North,
     South,

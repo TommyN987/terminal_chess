@@ -1,9 +1,9 @@
 use derive_new::new;
 
-use crate::{board::Board, direction::Direction, position::Position};
+use crate::{board::Board, direction::Direction, position::Position, Color};
 
 pub trait Moveable {
-    fn get_moves(&self, from: Position, board: &Board) -> Vec<Move>;
+    fn get_moves(&self, color: Color, has_moved: bool, from: Position, board: &Board) -> Vec<Move>;
 
     fn execute(self, legal_move: Move, board: &mut Board)
     where

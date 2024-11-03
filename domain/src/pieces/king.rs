@@ -2,18 +2,20 @@ use crate::{board::Board, direction::Direction, position::Position, Color};
 
 use super::moveable::{Move, MoveType, Moveable};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct King {
-    pub color: Color,
-    pub has_moved: bool,
     pub directions: [Direction; 8],
 }
 
+impl Default for King {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl King {
-    pub fn new(color: Color) -> Self {
+    pub fn new() -> Self {
         Self {
-            color,
-            has_moved: false,
             directions: [
                 Direction::North,
                 Direction::North,
@@ -29,8 +31,14 @@ impl King {
 }
 
 impl Moveable for King {
-    fn get_moves(&self, from: Position, board: &Board) -> Vec<super::moveable::Move> {
-        self.move_positions(from, board)
+    fn get_moves(
+        &self,
+        color: Color,
+        _has_moved: bool,
+        from: Position,
+        board: &Board,
+    ) -> Vec<super::moveable::Move> {
+        self.move_positions(color, from, board)
             .into_iter()
             .map(|to| Move::new(MoveType::Normal, from, to))
             .collect()
@@ -38,7 +46,7 @@ impl Moveable for King {
 }
 
 impl King {
-    fn move_positions(&self, from: Position, board: &Board) -> Vec<Position> {
+    fn move_positions(&self, color: Color, from: Position, board: &Board) -> Vec<Position> {
         self.directions
             .iter()
             .filter_map(|dir| {
@@ -49,7 +57,7 @@ impl King {
 
                 match board.get(&to) {
                     None => Some(to),
-                    Some(piece) => match piece.piece_color == self.color {
+                    Some(piece) => match piece.piece_color == color {
                         true => None,
                         false => Some(to),
                     },

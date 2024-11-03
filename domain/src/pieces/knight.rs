@@ -1,17 +1,19 @@
-use derive_new::new;
-
 use crate::{board::Board, direction::Direction, position::Position, Color};
 
 use super::moveable::{Move, MoveType, Moveable};
 
-#[derive(Debug, Clone, new)]
-pub struct Knight {
-    color: Color,
-}
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Knight;
 
 impl Moveable for Knight {
-    fn get_moves(&self, from: Position, board: &Board) -> Vec<Move> {
-        self.move_positions(from, board)
+    fn get_moves(
+        &self,
+        color: Color,
+        _has_moved: bool,
+        from: Position,
+        board: &Board,
+    ) -> Vec<Move> {
+        self.move_positions(color, from, board)
             .into_iter()
             .map(|to| Move::new(MoveType::Normal, from, to))
             .collect()
@@ -30,14 +32,14 @@ impl Knight {
         result
     }
 
-    fn move_positions(&self, from: Position, board: &Board) -> Vec<Position> {
+    fn move_positions(&self, color: Color, from: Position, board: &Board) -> Vec<Position> {
         self.potential_to_positions(from)
             .into_iter()
             .filter(|pos| {
                 board.is_inside(pos)
                     && match board.get(pos) {
                         None => true,
-                        Some(piece) => piece.piece_color != self.color,
+                        Some(piece) => piece.piece_color != color,
                     }
             })
             .collect()
