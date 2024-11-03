@@ -26,3 +26,23 @@ impl Add<Direction> for Position {
         Position::new(self.row + rhs.row_delta(), self.column + rhs.column_delta())
     }
 }
+
+impl Add for Position {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            row: self.row + rhs.row,
+            column: self.column + rhs.column,
+        }
+    }
+}
+
+impl From<(i8, i8)> for Position {
+    fn from(value: (i8, i8)) -> Self {
+        Self {
+            row: value.0,
+            column: value.1,
+        }
+    }
+}

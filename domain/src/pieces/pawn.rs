@@ -10,10 +10,8 @@ pub struct Pawn {
 
 impl Moveable for Pawn {
     fn get_moves(&self, from: Position, board: &Board) -> Vec<Move> {
-        vec![
-            self.forward_moves(from, board),
-            self.diagonal_moves(from, board),
-        ]
+        [self.forward_moves(from, board),
+            self.diagonal_moves(from, board)]
         .concat()
     }
 }
