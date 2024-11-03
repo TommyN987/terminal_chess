@@ -1,5 +1,8 @@
+use derive_new::new;
+
 use crate::Color;
 
+#[derive(Debug, Clone, PartialEq, new)]
 pub struct Player {
     color: Color,
 }
