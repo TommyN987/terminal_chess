@@ -7,6 +7,14 @@ pub struct Player {
     pub color: Color,
 }
 
+impl Default for Player {
+    fn default() -> Self {
+        Self {
+            color: Color::White,
+        }
+    }
+}
+
 impl Player {
     pub fn opponent(&self) -> Self {
         match self.color {

@@ -1,6 +1,7 @@
 use crate::{
     direction::Direction,
-    pieces::{Bishop, King, Knight, Pawn, Piece, PieceType, Queen, Rook},
+    pieces::{Bishop, King, Knight, Moveable, Pawn, Piece, PieceType, Queen, Rook},
+    player::Player,
     position::Position,
     Color,
 };
@@ -28,9 +29,46 @@ impl Board {
     pub fn is_inside(&self, pos: &Position) -> bool {
         pos.row >= 0 && pos.row < 8 && pos.column >= 0 && pos.column < 8
     }
+
+    pub fn is_in_check(&self, player: Player) -> bool {
+        self.piece_positions_for_player(player).iter().any(|pos| {
+            if let Some(piece) = self.get(pos) {
+                return piece.can_capture_opponent_king(
+                    piece.piece_color,
+                    piece.has_moved,
+                    *pos,
+                    self,
+                );
+            } else {
+                false
+            }
+        })
+    }
 }
 
 impl Board {
+    fn piece_positions(&self) -> Vec<Position> {
+        let mut positions = vec![];
+        for (i, row) in self.fields.iter().enumerate() {
+            for (j, cell) in row.iter().enumerate() {
+                if let Some(_) = cell {
+                    positions.push(Position::new(i as i8, j as i8));
+                }
+            }
+        }
+        positions
+    }
+
+    fn piece_positions_for_player(&self, player: Player) -> Vec<Position> {
+        self.piece_positions()
+            .into_iter()
+            .filter(|pos| match self.get(pos) {
+                None => false,
+                Some(piece) => piece.piece_color == player.color,
+            })
+            .collect()
+    }
+
     fn add_starting_pieces(&mut self) {
         self.set(
             &Position::new(0, 0),

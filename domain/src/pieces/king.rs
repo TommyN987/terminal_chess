@@ -1,6 +1,9 @@
 use crate::{board::Board, direction::Direction, position::Position, Color};
 
-use super::moveable::{Move, MoveType, Moveable};
+use super::{
+    moveable::{Move, MoveType, Moveable},
+    PieceType,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct King {
@@ -42,6 +45,21 @@ impl Moveable for King {
             .into_iter()
             .map(|to| Move::new(MoveType::Normal, from, to))
             .collect()
+    }
+
+    fn can_capture_opponent_king(
+        &self,
+        color: Color,
+        _has_moved: bool,
+        from: Position,
+        board: &Board,
+    ) -> bool {
+        self.move_positions(color, from, board)
+            .iter()
+            .any(|pos| match board.get(&pos) {
+                None => false,
+                Some(piece) => piece.piece_type == PieceType::King(King::default()),
+            })
     }
 }
 

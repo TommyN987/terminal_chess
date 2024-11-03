@@ -1,6 +1,9 @@
 use crate::{board::Board, direction::Direction, position::Position, Color};
 
-use super::moveable::{Move, MoveType, Moveable};
+use super::{
+    moveable::{Move, MoveType, Moveable},
+    King, PieceType,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Pawn {
@@ -14,6 +17,21 @@ impl Moveable for Pawn {
             self.diagonal_moves(color, from, board),
         ]
         .concat()
+    }
+
+    fn can_capture_opponent_king(
+        &self,
+        color: Color,
+        _has_moved: bool,
+        from: Position,
+        board: &Board,
+    ) -> bool {
+        self.diagonal_moves(color, from, board)
+            .iter()
+            .any(|m| match board.get(&m.to) {
+                None => false,
+                Some(piece) => piece.piece_type == PieceType::King(King::default()),
+            })
     }
 }
 
