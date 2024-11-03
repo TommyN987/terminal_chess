@@ -2,6 +2,7 @@ use crate::{board::Board, direction::Direction, position::Position};
 
 use super::moveable::{Move, MoveType, Moveable};
 
+#[derive(Debug, Clone)]
 pub struct Bishop {
     directions: Vec<Direction>,
 }

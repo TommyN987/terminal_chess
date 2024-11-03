@@ -2,6 +2,7 @@ use crate::{board::Board, direction::Direction, position::Position, Color};
 
 use super::moveable::{Move, MoveType, Moveable};
 
+#[derive(Debug, Clone)]
 pub struct Pawn {
     color: Color,
     forward: Direction,
@@ -10,8 +11,10 @@ pub struct Pawn {
 
 impl Moveable for Pawn {
     fn get_moves(&self, from: Position, board: &Board) -> Vec<Move> {
-        [self.forward_moves(from, board),
-            self.diagonal_moves(from, board)]
+        [
+            self.forward_moves(from, board),
+            self.diagonal_moves(from, board),
+        ]
         .concat()
     }
 }
