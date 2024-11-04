@@ -4,6 +4,7 @@ use std::{
     time::{Duration, Instant},
 };
 
+use domain::game::GameState;
 use ratatui::crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, MouseEvent};
 
 use crate::game::{AppResult, CurrentScreen, Game};
@@ -73,6 +74,7 @@ impl MessageHandler {
 
         match game.current_screen {
             CurrentScreen::Menu => self.handle_menu_key_events(key_event, game),
+            CurrentScreen::Game => self.handle_game_key_events(key_event, game),
             _ => Ok(()),
         }
     }
@@ -83,11 +85,20 @@ impl MessageHandler {
             KeyCode::Up | KeyCode::Char('k') => game.menu_state.previous(),
             KeyCode::Down | KeyCode::Char('j') => game.menu_state.next(),
             KeyCode::Enter => {
+                game.game_state = Some(GameState::new());
                 game.current_screen = CurrentScreen::Game;
             }
             _ => {}
         }
 
+        Ok(())
+    }
+
+    fn handle_game_key_events(&self, key_event: KeyEvent, game: &mut Game) -> AppResult<()> {
+        match key_event.code {
+            KeyCode::Char('q') => game.quit(),
+            _ => {}
+        };
         Ok(())
     }
 }

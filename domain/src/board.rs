@@ -8,7 +8,7 @@ use crate::{
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Board {
-    fields: [[Option<Piece>; 8]; 8],
+    pub fields: [[Option<Piece>; 8]; 8],
 }
 
 impl Board {
