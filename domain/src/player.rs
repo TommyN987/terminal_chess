@@ -2,7 +2,7 @@ use derive_new::new;
 
 use crate::Color;
 
-#[derive(Debug, Clone, PartialEq, new)]
+#[derive(Debug, Clone, Copy, PartialEq, new)]
 pub struct Player {
     pub color: Color,
 }

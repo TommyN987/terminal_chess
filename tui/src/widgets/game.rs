@@ -1,67 +1,20 @@
+use domain::position::Position;
 use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Stylize},
     widgets::{Block, StatefulWidget, Widget},
-    Frame,
 };
 
-use domain::{board::Board as DomainBoard, game::GameState};
-
-use super::{
+use crate::{
     constants::{BLACK, WHITE},
-    piece::Piece,
+    game::{Game, ViewState},
 };
 
-pub fn render_game_state(frame: &mut Frame, main_area: Rect, game_state: &mut GameState) {
-    let main_layout_horizontal = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints(
-            [
-                Constraint::Ratio(1, 18),
-                Constraint::Ratio(16, 18),
-                Constraint::Ratio(1, 18),
-            ]
-            .as_ref(),
-        )
-        .split(main_area);
+use super::piece::Piece;
 
-    let main_layout_vertical = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints(
-            [
-                Constraint::Ratio(2, 17),
-                Constraint::Ratio(9, 17),
-                Constraint::Ratio(1, 17),
-                Constraint::Ratio(5, 17),
-            ]
-            .as_ref(),
-        )
-        .split(main_layout_horizontal[1]);
-
-    frame.render_stateful_widget(
-        Board::from(game_state.board.clone()),
-        main_layout_vertical[1],
-        &mut Board::from(game_state.board.clone()),
-    );
-}
-
-pub struct Board(DomainBoard);
-
-impl From<DomainBoard> for Board {
-    fn from(value: DomainBoard) -> Self {
-        Self(value)
-    }
-}
-
-impl Board {
-    fn inner(&mut self) -> &mut DomainBoard {
-        &mut self.0
-    }
-}
-
-impl StatefulWidget for Board {
-    type State = Board;
+impl StatefulWidget for Game {
+    type State = ViewState;
 
     fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
         let cell_side_length = area.width / 8;
@@ -86,8 +39,8 @@ impl StatefulWidget for Board {
             )
             .split(area);
 
-        state
-            .inner()
+        self.game_state
+            .board
             .fields
             .iter()
             .enumerate()
@@ -111,7 +64,23 @@ impl StatefulWidget for Board {
                     )
                     .split(columns[i + 1]);
                 row.iter().enumerate().for_each(|(j, c)| {
-                    let cell_color: Color = if (i + j) % 2 == 0 { WHITE } else { BLACK };
+                    let mut cell_color: Color = if (i + j) % 2 == 0 { WHITE } else { BLACK };
+
+                    if let Some(selected) = state.selected_position {
+                        if selected == Position::from((i, j)) {
+                            cell_color = Color::Cyan;
+                        }
+                    }
+
+                    state.currently_legal_moves.iter().for_each(|pos| {
+                        if *pos == Position::from((i, j)) {
+                            cell_color = Color::Magenta;
+                        }
+                    });
+
+                    if state.cursor_position == Position::from((i, j)) {
+                        cell_color = Color::Blue;
+                    }
 
                     let cell = Block::default().bg(cell_color);
                     let square = lines[j + 1];

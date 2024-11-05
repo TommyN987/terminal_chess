@@ -10,7 +10,7 @@ use domain::{
     Color as DomainColor,
 };
 
-use super::constants::{BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK};
+use crate::constants::{BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK};
 
 pub struct Piece(DomainPiece);
 

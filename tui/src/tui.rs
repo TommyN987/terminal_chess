@@ -13,11 +13,9 @@ use std::{
 };
 
 use crate::{
-    game::{AppResult, Game},
+    app::{App, AppResult},
     message_handler::MessageHandler,
 };
-
-use super::ui;
 
 #[derive(Debug)]
 pub struct Tui<B: Backend> {
@@ -48,8 +46,11 @@ impl<B: Backend> Tui<B> {
         Ok(())
     }
 
-    pub fn draw(&mut self, game: &mut Game) -> AppResult<()> {
-        self.terminal.draw(|frame| ui::render(game, frame))?;
+    pub fn draw(&mut self, app: &mut App) -> AppResult<()> {
+        self.terminal.draw(|frame| {
+            let main_area = frame.area();
+            app.render(frame, main_area);
+        })?;
         Ok(())
     }
 

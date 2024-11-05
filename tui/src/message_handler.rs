@@ -4,10 +4,9 @@ use std::{
     time::{Duration, Instant},
 };
 
-use domain::game::GameState;
 use ratatui::crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, MouseEvent};
 
-use crate::game::{AppResult, CurrentScreen, Game};
+use crate::app::{App, AppResult, CurrentScreen, Direction};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
@@ -67,36 +66,41 @@ impl MessageHandler {
         Ok(self.receiver.recv()?)
     }
 
-    pub fn handle_key_events(&self, key_event: KeyEvent, game: &mut Game) -> AppResult<()> {
+    pub fn handle_key_events(&self, key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         if key_event.kind != KeyEventKind::Press {
             return Ok(());
         }
 
-        match game.current_screen {
-            CurrentScreen::Menu => self.handle_menu_key_events(key_event, game),
-            CurrentScreen::Game => self.handle_game_key_events(key_event, game),
+        match app.current_screen {
+            CurrentScreen::Menu => self.handle_menu_key_events(key_event, app),
+            CurrentScreen::Game => self.handle_game_key_events(key_event, app),
             _ => Ok(()),
         }
     }
 
-    fn handle_menu_key_events(&self, key_event: KeyEvent, game: &mut Game) -> AppResult<()> {
+    fn handle_menu_key_events(&self, key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         match key_event.code {
-            KeyCode::Char('q') => game.quit(),
-            KeyCode::Up | KeyCode::Char('k') => game.menu_state.previous(),
-            KeyCode::Down | KeyCode::Char('j') => game.menu_state.next(),
-            KeyCode::Enter => {
-                game.game_state = Some(GameState::new());
-                game.current_screen = CurrentScreen::Game;
-            }
+            KeyCode::Char('q') => app.quit(),
+            KeyCode::Up | KeyCode::Char('k') => app.move_menu_cursor(Direction::North),
+            KeyCode::Down | KeyCode::Char('j') => app.move_menu_cursor(Direction::South),
+            KeyCode::Enter => app.run(),
             _ => {}
         }
 
         Ok(())
     }
 
-    fn handle_game_key_events(&self, key_event: KeyEvent, game: &mut Game) -> AppResult<()> {
+    fn handle_game_key_events(&self, key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         match key_event.code {
-            KeyCode::Char('q') => game.quit(),
+            KeyCode::Char('q') => app.quit(),
+            KeyCode::Up | KeyCode::Char('k') => app.game.move_cursor(Direction::North),
+            KeyCode::Down | KeyCode::Char('j') => app.game.move_cursor(Direction::South),
+            KeyCode::Left | KeyCode::Char('h') => app.game.move_cursor(Direction::West),
+            KeyCode::Right | KeyCode::Char('l') => app.game.move_cursor(Direction::East),
+            KeyCode::Enter => match app.game.view_state.selected_position {
+                None => app.game.select_piece(),
+                Some(_) => {}
+            },
             _ => {}
         };
         Ok(())

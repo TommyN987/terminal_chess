@@ -4,25 +4,11 @@ use ratatui::{
     style::{Color, Modifier, Style},
     text::Text,
     widgets::{Block, Borders, List, ListItem, Padding, Paragraph, StatefulWidget, Widget},
-    Frame,
 };
 
-use crate::{game::Game, menu::MenuState};
+use crate::{constants::TITLE, menu::Menu};
 
-use super::constants::TITLE;
-
-pub fn render_menu(frame: &mut Frame, main_area: Rect, game: &mut Game) {
-    let layout = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([Constraint::Percentage(30), Constraint::Percentage(70)].as_ref())
-        .split(main_area);
-
-    frame.render_widget(AppTitle, layout[0]);
-
-    frame.render_stateful_widget(game.menu_state.clone(), layout[1], &mut game.menu_state);
-}
-
-struct AppTitle;
+pub struct AppTitle;
 
 impl Widget for AppTitle {
     fn render(self, area: Rect, buf: &mut Buffer)
@@ -48,8 +34,8 @@ impl Widget for AppTitle {
     }
 }
 
-impl StatefulWidget for MenuState {
-    type State = Self;
+impl StatefulWidget for Menu {
+    type State = usize;
 
     fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
         let layout = Layout::default()
@@ -57,12 +43,12 @@ impl StatefulWidget for MenuState {
             .constraints([Constraint::Percentage(50)])
             .flex(Flex::Center)
             .split(area);
-        let list_items: Vec<ListItem> = state
+        let list_items: Vec<ListItem> = self
             .items
             .iter()
             .enumerate()
             .map(|(i, &item)| {
-                if state.selected == i {
+                if *state == i {
                     ListItem::new(Text::from(format!("> {}", item)).alignment(Alignment::Center))
                         .style(
                             Style::default()

@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::ops::{Add, AddAssign};
 
 use derive_new::new;
 
@@ -27,6 +27,12 @@ impl Add<Direction> for Position {
     }
 }
 
+impl AddAssign<Direction> for Position {
+    fn add_assign(&mut self, rhs: Direction) {
+        *self = *self + rhs;
+    }
+}
+
 impl Add for Position {
     type Output = Self;
 
@@ -43,6 +49,15 @@ impl From<(i8, i8)> for Position {
         Self {
             row: value.0,
             column: value.1,
+        }
+    }
+}
+
+impl From<(usize, usize)> for Position {
+    fn from(value: (usize, usize)) -> Self {
+        Self {
+            row: value.0 as i8,
+            column: value.1 as i8,
         }
     }
 }
