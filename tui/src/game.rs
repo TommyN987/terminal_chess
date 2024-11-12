@@ -1,16 +1,41 @@
+use std::fmt::Display;
+
 use domain::{game::GameState, position::Position};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     Frame,
 };
 
-use crate::app::Direction as CursorDirection;
+use crate::{app::Direction as CursorDirection, widgets::game::Debugger};
 
 #[derive(Debug, Clone)]
 pub struct Game {
     pub game_state: GameState,
     pub view_state: ViewState,
     pub is_running: bool,
+    pub debugger: Vec<String>,
+}
+
+impl Display for Game {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "Game state:")?;
+        writeln!(f, "Current player: {:?}", self.game_state.current_player)?;
+        writeln!(f, "Cursor position: {:?}", self.view_state.cursor_position)?;
+        writeln!(
+            f,
+            "Selected position: {:?}",
+            self.view_state.selected_position
+        )?;
+        writeln!(
+            f,
+            "Currently legal moves: {:?}",
+            self.view_state.currently_legal_moves
+        )?;
+        for stmt in self.debugger.iter() {
+            writeln!(f, "{}", stmt)?;
+        }
+        Ok(())
+    }
 }
 
 impl Game {
@@ -19,6 +44,7 @@ impl Game {
             game_state,
             view_state: ViewState::default(),
             is_running: true,
+            debugger: vec![],
         }
     }
 
@@ -46,7 +72,18 @@ impl Game {
         if let Some(_) = self.game_state.board.get(&self.view_state.cursor_position) {
             let position = self.view_state.cursor_position;
             self.view_state.selected_position = Some(position.clone());
-            if let Some((_, moves)) = self.game_state.legal_moves_for_piece(position) {
+            self.debugger.push(format!(
+                "Selected position in select_piece: {:?}",
+                self.view_state.selected_position
+            ));
+            if let Some((piece, moves)) = self
+                .game_state
+                .legal_moves_for_piece(self.view_state.selected_position.unwrap())
+            {
+                self.debugger.push(self.game_state.board.to_string());
+                self.debugger.push(format!("Position: {:?}", position));
+                self.debugger.push(format!("Piece: {:?}", piece));
+                self.debugger.push(format!("Legal moves: {:?}", moves));
                 self.view_state.currently_legal_moves = moves.into_iter().map(|m| m.to).collect();
             }
         }
@@ -83,6 +120,7 @@ impl Game {
             .split(main_layout_horizontal[1]);
 
         frame.render_stateful_widget(self.clone(), main_layout_vertical[1], &mut self.view_state);
+        frame.render_stateful_widget(Debugger, main_layout_vertical[3], &mut self);
     }
 }
 

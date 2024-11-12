@@ -29,7 +29,7 @@ impl GameState {
                         piece
                             .get_moves(piece.piece_color, piece.has_moved, from, &self.board)
                             .into_iter()
-                            .filter(|m| piece.is_legal(*m, from, &self.board))
+                            //.filter(|m| piece.is_legal(*m, from, &self.board))
                             .collect(),
                     ))
                 } else {

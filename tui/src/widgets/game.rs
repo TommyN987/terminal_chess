@@ -2,8 +2,8 @@ use domain::position::Position;
 use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},
-    style::{Color, Stylize},
-    widgets::{Block, StatefulWidget, Widget},
+    style::{Color, Style, Stylize},
+    widgets::{Block, Paragraph, StatefulWidget, Widget, Wrap},
 };
 
 use crate::{
@@ -12,6 +12,26 @@ use crate::{
 };
 
 use super::piece::Piece;
+
+pub struct Debugger;
+
+impl StatefulWidget for Debugger {
+    type State = Game;
+
+    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
+        let block = Block::default()
+            .title("Debugger")
+            .bg(Color::Black)
+            .fg(Color::White);
+
+        let paragraph = Paragraph::new(state.to_string())
+            .block(block)
+            .wrap(Wrap { trim: true })
+            .style(Style::new().fg(Color::White).bg(Color::Black));
+
+        Widget::render(paragraph, area, buf);
+    }
+}
 
 impl StatefulWidget for Game {
     type State = ViewState;

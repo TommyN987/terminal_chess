@@ -82,7 +82,7 @@ pub trait Moveable {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MoveType {
     Normal,
     ShortCastle,
@@ -92,7 +92,7 @@ pub enum MoveType {
     Promotion,
 }
 
-#[derive(Debug, Clone, Copy, new)]
+#[derive(Debug, Clone, Copy, PartialEq, new)]
 pub struct Move {
     pub move_type: MoveType,
     pub from: Position,

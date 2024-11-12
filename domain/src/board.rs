@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::{
     direction::Direction,
     pieces::{Bishop, King, Knight, Moveable, Pawn, Piece, PieceType, Queen, Rook},
@@ -9,6 +11,32 @@ use crate::{
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Board {
     pub fields: [[Option<Piece>; 8]; 8],
+}
+
+impl Display for Board {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for row in self.fields {
+            for cell in row {
+                match cell {
+                    None => write!(f, "[ ]")?,
+                    Some(p) => write!(
+                        f,
+                        "[{}]",
+                        match p.piece_type {
+                            PieceType::Pawn(_) => "p",
+                            PieceType::Rook(_) => "R",
+                            PieceType::King(_) => "K",
+                            PieceType::Queen(_) => "Q",
+                            PieceType::Bishop(_) => "B",
+                            PieceType::Knight(_) => "N",
+                        }
+                    )?,
+                }
+            }
+            write!(f, "\n")?;
+        }
+        Ok(())
+    }
 }
 
 impl Board {

@@ -85,3 +85,160 @@ impl Pawn {
         result
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::pieces::Piece;
+
+    use super::*;
+
+    #[test]
+    fn test_pawn_initial_double_move() {
+        let board = Board::new();
+        let white_pawn = Pawn::new(Direction::North);
+        let start_pos = Position::from((6, 4));
+        let moves = white_pawn.get_moves(Color::White, false, start_pos, &board);
+
+        assert_eq!(moves.len(), 2);
+        assert!(moves.contains(&Move::new(
+            MoveType::Normal,
+            start_pos,
+            Position::from((5, 4))
+        )));
+        assert!(moves.contains(&Move::new(
+            MoveType::DoublePawn,
+            start_pos,
+            Position::from((4, 4))
+        )));
+    }
+
+    #[test]
+    fn test_pawn_single_forward_move_after_initial() {
+        let mut board = Board::new();
+        let white_pawn = Pawn::new(Direction::North);
+        let start_pos = Position::from((5, 4));
+        board.set(
+            &start_pos,
+            Some(Piece::new(PieceType::Pawn(white_pawn), Color::White)),
+        );
+
+        let moves = white_pawn.get_moves(Color::White, true, start_pos, &board);
+
+        assert_eq!(moves.len(), 1);
+        assert!(moves.contains(&Move::new(
+            MoveType::Normal,
+            start_pos,
+            Position::from((4, 4))
+        )));
+    }
+
+    #[test]
+    fn test_pawn_cannot_move_forward_if_blocked() {
+        let mut board = Board::new();
+        let white_pawn = Pawn::new(Direction::North);
+        let start_pos = Position::from((5, 4));
+        board.set(
+            &Position::from((4, 4)),
+            Some(Piece::new(
+                PieceType::Pawn(Pawn::new(Direction::South)),
+                Color::Black,
+            )),
+        );
+
+        let moves = white_pawn.get_moves(Color::White, true, start_pos, &board);
+
+        assert!(
+            moves.is_empty(),
+            "Pawn should not be able to move forward if blocked"
+        );
+    }
+
+    #[test]
+    fn test_pawn_capture_move() {
+        let mut board = Board::new();
+        let white_pawn = Pawn::new(Direction::North);
+        let start_pos = Position::from((4, 4));
+        board.set(
+            &Position::from((3, 3)),
+            Some(Piece::new(
+                PieceType::Pawn(Pawn::new(Direction::South)),
+                Color::Black,
+            )),
+        );
+        board.set(
+            &Position::from((3, 5)),
+            Some(Piece::new(
+                PieceType::Pawn(Pawn::new(Direction::South)),
+                Color::Black,
+            )),
+        );
+
+        let moves = white_pawn.get_moves(Color::White, true, start_pos, &board);
+
+        assert_eq!(moves.len(), 3);
+        assert!(moves.contains(&Move::new(
+            MoveType::Normal,
+            start_pos,
+            Position::from((3, 3))
+        )));
+        assert!(moves.contains(&Move::new(
+            MoveType::Normal,
+            start_pos,
+            Position::from((3, 5))
+        )));
+        assert!(moves.contains(&Move::new(
+            MoveType::Normal,
+            start_pos,
+            Position::from((3, 4))
+        )));
+    }
+
+    #[test]
+    fn test_pawn_cannot_capture_own_piece() {
+        let mut board = Board::new();
+        let white_pawn = Pawn::new(Direction::North);
+        let start_pos = Position::from((4, 4));
+        board.set(
+            &Position::from((3, 3)),
+            Some(Piece::new(
+                PieceType::Pawn(Pawn::new(Direction::North)),
+                Color::White,
+            )),
+        );
+        board.set(
+            &Position::from((3, 5)),
+            Some(Piece::new(
+                PieceType::Pawn(Pawn::new(Direction::North)),
+                Color::White,
+            )),
+        );
+
+        let moves = white_pawn.get_moves(Color::White, true, start_pos, &board);
+
+        assert!(!moves.contains(&Move::new(
+            MoveType::Normal,
+            start_pos,
+            Position::from((3, 3))
+        )));
+        assert!(!moves.contains(&Move::new(
+            MoveType::Normal,
+            start_pos,
+            Position::from((3, 5))
+        )));
+    }
+
+    #[test]
+    fn test_can_capture_opponent_king() {
+        let mut board = Board::new();
+        let white_pawn = Pawn::new(Direction::North);
+        let pos = Position::from((4, 4));
+        board.set(
+            &Position::from((3, 3)),
+            Some(Piece::new(PieceType::King(King::new()), Color::Black)),
+        );
+        let can_capture_king =
+            white_pawn.can_capture_opponent_king(Color::White, true, pos, &board);
+
+        assert!(can_capture_king);
+    }
+}

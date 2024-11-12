@@ -44,6 +44,15 @@ impl Add for Position {
     }
 }
 
+impl From<(i32, i32)> for Position {
+    fn from(value: (i32, i32)) -> Self {
+        Self {
+            row: value.0 as i8,
+            column: value.1 as i8,
+        }
+    }
+}
+
 impl From<(i8, i8)> for Position {
     fn from(value: (i8, i8)) -> Self {
         Self {
