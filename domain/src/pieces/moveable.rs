@@ -34,9 +34,8 @@ pub trait Moveable {
                     Some(piece) => {
                         if current_piece.piece_color != piece.piece_color {
                             result.push(pos);
-                        } else {
-                            break;
                         }
+                        break;
                     }
                 }
                 pos = pos + *dir;
