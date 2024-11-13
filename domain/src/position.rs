@@ -4,7 +4,7 @@ use derive_new::new;
 
 use crate::{direction::Direction, Color};
 
-#[derive(Debug, Copy, Clone, PartialEq, Hash, new)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, new)]
 pub struct Position {
     pub row: i8,
     pub column: i8,

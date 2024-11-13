@@ -132,10 +132,6 @@ mod tests {
         // Assert
         let result_positions: Vec<_> = moves.iter().map(|m| m.to).collect();
 
-        for pos in result_positions.iter() {
-            println!("Position: {:?}", pos);
-        }
-
         assert!(
             result_positions.contains(&opponent_position),
             "Rook  should be able to capture at (4, 5)"
