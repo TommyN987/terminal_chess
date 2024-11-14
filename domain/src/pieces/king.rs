@@ -56,7 +56,7 @@ impl Moveable for King {
     ) -> bool {
         self.move_positions(color, from, board)
             .iter()
-            .any(|pos| match board.get(&pos) {
+            .any(|pos| match board.get(pos) {
                 None => false,
                 Some(piece) => piece.piece_type == PieceType::King(King::default()),
             })

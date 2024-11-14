@@ -86,7 +86,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_piece_can_capture_opponent_king() {
+    fn test_piece_can_capture_opponent_king_works() {
         let mut board = Board::default();
         let opponent_king_position = Position::from((4, 4));
         let white_pieces = vec![

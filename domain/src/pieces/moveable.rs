@@ -38,7 +38,7 @@ pub trait Moveable {
                         break;
                     }
                 }
-                pos = pos + *dir;
+                pos += *dir;
             }
         }
         result
@@ -72,7 +72,7 @@ pub trait Moveable {
 
     fn is_legal(&self, m: Move, from: Position, board: &Board) -> bool {
         if let Some(piece) = board.get(&from) {
-            let player = Player::new(piece.piece_color);
+            let player = Player::new(piece.piece_color).opponent();
             let mut cloned_board = board.clone();
             piece.execute(m, &mut cloned_board);
             return cloned_board.is_in_check(player);

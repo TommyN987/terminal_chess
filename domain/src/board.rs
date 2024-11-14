@@ -33,7 +33,7 @@ impl Display for Board {
                     )?,
                 }
             }
-            write!(f, "\n")?;
+            writeln!(f)?;
         }
         Ok(())
     }
@@ -59,18 +59,15 @@ impl Board {
     }
 
     pub fn is_in_check(&self, player: Player) -> bool {
-        self.piece_positions_for_player(player).iter().any(|pos| {
-            if let Some(piece) = self.get(pos) {
-                return piece.can_capture_opponent_king(
-                    piece.piece_color,
-                    piece.has_moved,
-                    *pos,
-                    self,
-                );
-            } else {
-                false
-            }
-        })
+        self.piece_positions_for_player(player.opponent())
+            .iter()
+            .any(|pos| {
+                if let Some(piece) = self.get(pos) {
+                    piece.can_capture_opponent_king(piece.piece_color, piece.has_moved, *pos, self)
+                } else {
+                    false
+                }
+            })
     }
 }
 
@@ -180,5 +177,30 @@ impl Board {
             &Position::new(7, 7),
             Some(Piece::new(PieceType::Rook(Rook::new()), Color::White)),
         );
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_in_check_works() {
+        let mut board = Board::new();
+        let white = Player::new(Color::White);
+
+        let is_white_in_check = board.is_in_check(white);
+
+        assert!(!is_white_in_check);
+
+        board.set(&Position::from((6, 3)), None);
+        board.set(
+            &Position::from((4, 1)),
+            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::Black)),
+        );
+
+        let is_white_in_check = board.is_in_check(white);
+
+        assert!(is_white_in_check);
     }
 }
