@@ -78,12 +78,10 @@ pub struct Move {
 
 impl Move {
     pub fn execute(&self, board: &mut Board) {
-        let piece = board.get(&self.from);
-        board.set(&self.to, piece);
-        board.set(&self.from, None);
-
-        if let Some(mut piece) = piece {
+        if let Some(mut piece) = board.get(&self.from) {
             piece.has_moved = true;
+            board.set(&self.to, Some(piece));
+            board.set(&self.from, None);
         }
     }
 

@@ -93,7 +93,7 @@ impl StatefulWidget for Game {
                     }
 
                     state.currently_legal_moves.iter().for_each(|pos| {
-                        if *pos == Position::from((i, j)) {
+                        if pos.to == Position::from((i, j)) {
                             cell_color = Color::Magenta;
                         }
                     });

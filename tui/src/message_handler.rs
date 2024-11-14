@@ -99,7 +99,42 @@ impl MessageHandler {
             KeyCode::Right | KeyCode::Char('l') => app.game.move_cursor(Direction::East),
             KeyCode::Enter => match app.game.view_state.selected_position {
                 None => app.game.select_piece(),
-                Some(_) => {}
+                Some(_) => {
+                    let cursor_position = app.game.view_state.cursor_position;
+
+                    match app.game.game_state.board.get(&cursor_position) {
+                        None => {
+                            let maybe_move = app
+                                .game
+                                .view_state
+                                .currently_legal_moves
+                                .iter()
+                                .find(|m| m.to == cursor_position);
+
+                            if let Some(m) = maybe_move {
+                                app.game.game_state.make_move(*m);
+                                app.game.view_state.currently_legal_moves.clear();
+                            }
+                        }
+                        Some(piece) => {
+                            if app.game.game_state.current_player.color == piece.piece_color {
+                                app.game.select_piece();
+                                return Ok(());
+                            }
+                            let maybe_move = app
+                                .game
+                                .view_state
+                                .currently_legal_moves
+                                .iter()
+                                .find(|m| m.to == cursor_position);
+
+                            if let Some(m) = maybe_move {
+                                app.game.game_state.make_move(*m);
+                                app.game.view_state.currently_legal_moves.clear();
+                            }
+                        }
+                    }
+                }
             },
             _ => {}
         };

@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use domain::{game::GameState, position::Position};
+use domain::{game::GameState, pieces::Move, position::Position};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     Frame,
@@ -21,11 +21,9 @@ impl Display for Game {
         writeln!(f, "Game state:")?;
         writeln!(f, "Current player: {:?}", self.game_state.current_player)?;
         writeln!(f, "Cursor position: {:?}", self.view_state.cursor_position)?;
-        writeln!(
-            f,
-            "Selected position: {:?}",
-            self.view_state.selected_position
-        )?;
+        if let Some(pos) = self.view_state.selected_position {
+            writeln!(f, "Selected piece: {:?}", self.game_state.board.get(&pos))?;
+        }
         writeln!(
             f,
             "Currently legal moves: {:?}",
@@ -72,19 +70,11 @@ impl Game {
         if let Some(_) = self.game_state.board.get(&self.view_state.cursor_position) {
             let position = self.view_state.cursor_position;
             self.view_state.selected_position = Some(position.clone());
-            self.debugger.push(format!(
-                "Selected position in select_piece: {:?}",
-                self.view_state.selected_position
-            ));
-            if let Some((piece, moves)) = self
+            if let Some((_, moves)) = self
                 .game_state
                 .legal_moves_for_piece(self.view_state.selected_position.unwrap())
             {
-                self.debugger.push(self.game_state.board.to_string());
-                self.debugger.push(format!("Position: {:?}", position));
-                self.debugger.push(format!("Piece: {:?}", piece));
-                self.debugger.push(format!("Legal moves: {:?}", moves));
-                self.view_state.currently_legal_moves = moves.into_iter().map(|m| m.to).collect();
+                self.view_state.currently_legal_moves = moves;
             }
         }
     }
@@ -128,7 +118,7 @@ impl Game {
 pub struct ViewState {
     pub cursor_position: Position,
     pub selected_position: Option<Position>,
-    pub currently_legal_moves: Vec<Position>,
+    pub currently_legal_moves: Vec<Move>,
 }
 
 impl Default for ViewState {
