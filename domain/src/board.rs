@@ -76,15 +76,15 @@ impl Board {
 
 impl Board {
     fn piece_positions(&self) -> Vec<Position> {
-        let mut positions = vec![];
-        for (i, row) in self.fields.iter().enumerate() {
-            for (j, cell) in row.iter().enumerate() {
-                if let Some(_) = cell {
-                    positions.push(Position::new(i as i8, j as i8));
-                }
-            }
-        }
-        positions
+        self.fields
+            .iter()
+            .enumerate()
+            .flat_map(|(i, row)| {
+                row.iter().enumerate().filter_map(move |(j, cell)| {
+                    cell.as_ref().map(|_| Position::new(i as i8, j as i8))
+                })
+            })
+            .collect()
     }
 
     fn piece_positions_for_player(&self, player: Player) -> Vec<Position> {

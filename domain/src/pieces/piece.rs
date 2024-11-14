@@ -78,3 +78,88 @@ impl Moveable for Piece {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::direction::Direction;
+
+    use super::*;
+
+    #[test]
+    fn test_piece_can_capture_opponent_king() {
+        let mut board = Board::default();
+        let opponent_king_position = Position::from((4, 4));
+        let white_pieces = vec![
+            (
+                Piece::new(PieceType::Pawn(Pawn::new(Direction::North)), Color::White),
+                Position::from((5, 5)),
+            ),
+            (
+                Piece::new(PieceType::Knight(Knight), Color::White),
+                Position::from((2, 3)),
+            ),
+            (
+                Piece::new(PieceType::Bishop(Bishop::new()), Color::White),
+                Position::from((7, 1)),
+            ),
+            (
+                Piece::new(PieceType::Rook(Rook::new()), Color::White),
+                Position::from((4, 7)),
+            ),
+            (
+                Piece::new(PieceType::Queen(Queen::new()), Color::White),
+                Position::from((4, 0)),
+            ),
+            (
+                Piece::new(PieceType::King(King::new()), Color::White),
+                Position::from((5, 4)),
+            ),
+        ];
+
+        let non_capturing_pieces = vec![
+            (
+                Piece::new(PieceType::Pawn(Pawn::new(Direction::North)), Color::White),
+                Position::from((6, 0)),
+            ),
+            (
+                Piece::new(PieceType::Queen(Queen::new()), Color::White),
+                Position::from((7, 7)),
+            ),
+            (
+                Piece::new(PieceType::Bishop(Bishop::new()), Color::White),
+                Position::from((7, 4)),
+            ),
+        ];
+
+        board.set(
+            &opponent_king_position,
+            Some(Piece::new(PieceType::King(King::new()), Color::Black)),
+        );
+
+        white_pieces.iter().for_each(|(piece, pos)| {
+            board.set(pos, Some(*piece));
+        });
+
+        non_capturing_pieces.iter().for_each(|(piece, pos)| {
+            board.set(pos, Some(*piece));
+        });
+
+        for (piece, pos) in white_pieces {
+            assert!(
+                piece.can_capture_opponent_king(Color::White, true, pos, &board),
+                "{:?} should be able to capture opponent king from position {:?}",
+                piece,
+                pos
+            );
+        }
+
+        for (piece, pos) in non_capturing_pieces {
+            assert!(
+                !piece.can_capture_opponent_king(Color::White, true, pos, &board),
+                "{:?} should not be able to capture opponent king from position {:?}",
+                piece,
+                pos
+            );
+        }
+    }
+}
