@@ -188,10 +188,13 @@ mod tests {
     fn test_is_in_check_works() {
         let mut board = Board::new();
         let white = Player::new(Color::White);
+        let black = Player::new(Color::Black);
 
         let is_white_in_check = board.is_in_check(white);
+        let is_black_in_check = board.is_in_check(black);
 
         assert!(!is_white_in_check);
+        assert!(!is_black_in_check);
 
         board.set(&Position::from((6, 3)), None);
         board.set(
@@ -200,7 +203,29 @@ mod tests {
         );
 
         let is_white_in_check = board.is_in_check(white);
+        let is_black_in_check = board.is_in_check(black);
 
         assert!(is_white_in_check);
+        assert!(!is_black_in_check);
+
+        board = Board::new();
+
+        let is_white_in_check = board.is_in_check(white);
+        let is_black_in_check = board.is_in_check(black);
+
+        assert!(!is_white_in_check);
+        assert!(!is_black_in_check);
+
+        board.set(&Position::from((1, 3)), None);
+        board.set(
+            &Position::from((3, 1)),
+            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::White)),
+        );
+
+        let is_white_in_check = board.is_in_check(white);
+        let is_black_in_check = board.is_in_check(black);
+
+        assert!(!is_white_in_check);
+        assert!(is_black_in_check);
     }
 }
