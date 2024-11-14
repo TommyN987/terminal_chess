@@ -100,7 +100,7 @@ impl Move {
 
 #[cfg(test)]
 mod tests {
-    use crate::pieces::{Pawn, Piece};
+    use crate::pieces::{Bishop, Pawn, Piece};
 
     use super::*;
 
@@ -126,13 +126,20 @@ mod tests {
 
     #[test]
     fn test_is_legal_works() {
-        let board = Board::new();
+        let mut board = Board::new();
 
-        let from = Position::from((6, 0));
-        let to = Position::from((5, 0));
+        let from = Position::from((6, 3));
+        let to = Position::from((5, 3));
 
         let m = Move::new(MoveType::Normal, from, to);
 
         assert!(m.is_legal(&board));
+
+        board.set(
+            &Position::from((4, 1)),
+            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::Black)),
+        );
+
+        assert!(!m.is_legal(&board));
     }
 }
