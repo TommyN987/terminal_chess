@@ -1,3 +1,5 @@
+use derive_new::new;
+
 use crate::{board::Board, direction::Direction, position::Position, Color};
 
 use super::{
@@ -5,7 +7,7 @@ use super::{
     King, PieceType,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, new)]
 pub struct Pawn {
     forward: Direction,
 }
@@ -36,10 +38,6 @@ impl Moveable for Pawn {
 }
 
 impl Pawn {
-    pub fn new(forward: Direction) -> Self {
-        Self { forward }
-    }
-
     fn can_move_to(&self, pos: &Position, board: &Board) -> bool {
         board.is_inside(pos) && board.get(pos).is_none()
     }

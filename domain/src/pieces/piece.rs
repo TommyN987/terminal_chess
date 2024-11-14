@@ -2,30 +2,6 @@ use crate::{board::Board, position::Position, Color};
 
 use super::{Bishop, King, Knight, Move, Moveable, Pawn, Queen, Rook};
 
-#[derive(Debug, Clone, Copy)]
-pub enum PieceType {
-    Pawn(Pawn),
-    Bishop(Bishop),
-    Knight(Knight),
-    Rook(Rook),
-    Queen(Queen),
-    King(King),
-}
-
-impl PartialEq for PieceType {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (PieceType::King(_), PieceType::King(_)) => true,
-            (PieceType::Rook(_), PieceType::Rook(_)) => true,
-            (PieceType::Bishop(_), PieceType::Bishop(_)) => true,
-            (PieceType::Pawn(_), PieceType::Pawn(_)) => true,
-            (PieceType::Queen(_), PieceType::Queen(_)) => true,
-            (PieceType::Knight(_), PieceType::Knight(_)) => true,
-            _ => false,
-        }
-    }
-}
-
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Piece {
     pub piece_type: PieceType,
@@ -76,6 +52,30 @@ impl Moveable for Piece {
                 knight.can_capture_opponent_king(color, has_moved, from, board)
             }
         }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum PieceType {
+    Pawn(Pawn),
+    Bishop(Bishop),
+    Knight(Knight),
+    Rook(Rook),
+    Queen(Queen),
+    King(King),
+}
+
+impl PartialEq for PieceType {
+    fn eq(&self, other: &Self) -> bool {
+        matches!(
+            (self, other),
+            (PieceType::King(_), PieceType::King(_))
+                | (PieceType::Rook(_), PieceType::Rook(_))
+                | (PieceType::Bishop(_), PieceType::Bishop(_))
+                | (PieceType::Pawn(_), PieceType::Pawn(_))
+                | (PieceType::Queen(_), PieceType::Queen(_))
+                | (PieceType::Knight(_), PieceType::Knight(_))
+        )
     }
 }
 
