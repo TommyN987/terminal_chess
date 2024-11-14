@@ -58,7 +58,11 @@ impl Pawn {
         let one_move_position = from + self.forward;
 
         if self.can_move_to(&one_move_position, board) {
-            result.push(Move::new(MoveType::Normal, from, one_move_position));
+            result.push(Move::new(
+                self.derive_move_type(&one_move_position),
+                from,
+                one_move_position,
+            ));
 
             let two_move_position = one_move_position + self.forward;
 
@@ -76,11 +80,18 @@ impl Pawn {
             let to = from + self.forward + dir;
 
             if self.can_capture_at(color, &to, board) {
-                result.push(Move::new(MoveType::Normal, from, to));
+                result.push(Move::new(self.derive_move_type(&to), from, to));
             }
         }
 
         result
+    }
+
+    fn derive_move_type(&self, to: &Position) -> MoveType {
+        if to.row == 0 || to.row == 7 {
+            return MoveType::Promotion;
+        }
+        MoveType::Normal
     }
 }
 

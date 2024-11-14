@@ -61,15 +61,14 @@ impl GameState {
         self.board
             .piece_positions_for_player(player)
             .iter()
-            .filter_map(|pos| match self.board.get(pos) {
-                None => None,
-                Some(piece) => Some(
+            .filter_map(|pos| {
+                self.board.get(pos).map(|piece| {
                     piece
                         .get_moves(piece.piece_color, piece.has_moved, *pos, &self.board)
                         .into_iter()
                         .filter(|m| m.is_legal(&self.board))
-                        .collect::<Vec<Move>>(),
-                ),
+                        .collect::<Vec<Move>>()
+                })
             })
             .flatten()
             .collect()

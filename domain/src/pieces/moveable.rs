@@ -112,14 +112,11 @@ mod tests {
 
         m.execute(&mut board);
 
+        let mut moved_pawn = Piece::new(PieceType::Pawn(Pawn::new(Direction::North)), Color::White);
+        moved_pawn.has_moved = true;
+
         assert!(board.get(&from).is_none());
-        assert_eq!(
-            board.get(&to),
-            Some(Piece::new(
-                PieceType::Pawn(Pawn::new(Direction::North)),
-                Color::White
-            ))
-        );
+        assert_eq!(board.get(&to), Some(moved_pawn));
     }
 
     #[test]
