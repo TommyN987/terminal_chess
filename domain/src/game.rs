@@ -35,7 +35,7 @@ impl GameState {
                         piece
                             .get_moves(piece.piece_color, piece.has_moved, from, &self.board)
                             .into_iter()
-                            .filter(|m| piece.is_legal(*m, from, &self.board))
+                            .filter(|m| m.is_legal(&self.board))
                             .collect(),
                     ))
                 } else {
@@ -45,8 +45,8 @@ impl GameState {
         }
     }
 
-    pub fn make_move(&mut self, piece: Piece, m: Move) {
-        piece.execute(m, &mut self.board);
+    pub fn make_move(&mut self, m: Move) {
+        m.execute(&mut self.board);
         self.current_player = self.current_player.opponent();
     }
 }
