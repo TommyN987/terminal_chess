@@ -59,7 +59,7 @@ impl Board {
     }
 
     pub fn is_in_check(&self, player: Player) -> bool {
-        self.piece_positions_for_player(player.opponent())
+        self.piece_positions_for_player(&player.opponent())
             .iter()
             .any(|pos| {
                 if let Some(piece) = self.get(pos) {
@@ -68,6 +68,16 @@ impl Board {
                     false
                 }
             })
+    }
+
+    pub fn piece_positions_for_player(&self, player: &Player) -> Vec<Position> {
+        self.piece_positions()
+            .into_iter()
+            .filter(|pos| match self.get(pos) {
+                None => false,
+                Some(piece) => piece.piece_color == player.color,
+            })
+            .collect()
     }
 }
 
@@ -80,16 +90,6 @@ impl Board {
                 row.iter().enumerate().filter_map(move |(j, cell)| {
                     cell.as_ref().map(|_| Position::new(i as i8, j as i8))
                 })
-            })
-            .collect()
-    }
-
-    fn piece_positions_for_player(&self, player: Player) -> Vec<Position> {
-        self.piece_positions()
-            .into_iter()
-            .filter(|pos| match self.get(pos) {
-                None => false,
-                Some(piece) => piece.piece_color == player.color,
             })
             .collect()
     }
