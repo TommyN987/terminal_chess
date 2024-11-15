@@ -12,6 +12,7 @@ use domain::{
 
 use crate::constants::{BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK};
 
+#[derive(Debug, Clone)]
 pub struct Piece(DomainPiece);
 
 impl From<&DomainPiece> for Piece {

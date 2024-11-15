@@ -4,9 +4,13 @@ use std::{
     time::{Duration, Instant},
 };
 
+use domain::pieces::MoveType;
 use ratatui::crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, MouseEvent};
 
-use crate::app::{App, AppResult, CurrentScreen, Direction};
+use crate::{
+    app::{App, AppResult, CurrentScreen, Direction},
+    widgets::promotion_menu::PromotionMenu,
+};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
@@ -93,10 +97,36 @@ impl MessageHandler {
     fn handle_game_key_events(&self, key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         match key_event.code {
             KeyCode::Char('q') => app.quit(),
-            KeyCode::Up | KeyCode::Char('k') => app.game.move_cursor(Direction::North),
-            KeyCode::Down | KeyCode::Char('j') => app.game.move_cursor(Direction::South),
-            KeyCode::Left | KeyCode::Char('h') => app.game.move_cursor(Direction::West),
-            KeyCode::Right | KeyCode::Char('l') => app.game.move_cursor(Direction::East),
+            KeyCode::Up | KeyCode::Char('k') => {
+                if app.game.view_state.promotion_menu.is_none() {
+                    app.game.move_cursor(Direction::North)
+                }
+            }
+            KeyCode::Down | KeyCode::Char('j') => {
+                if app.game.view_state.promotion_menu.is_none() {
+                    app.game.move_cursor(Direction::South)
+                }
+            }
+            KeyCode::Left | KeyCode::Char('h') => match app.game.view_state.promotion_menu {
+                None => app.game.move_cursor(Direction::West),
+                Some(ref mut promotion_menu) => {
+                    if promotion_menu.selected <= 0 {
+                        promotion_menu.selected = 3;
+                    } else {
+                        promotion_menu.selected -= 1;
+                    }
+                }
+            },
+            KeyCode::Right | KeyCode::Char('l') => match app.game.view_state.promotion_menu {
+                None => app.game.move_cursor(Direction::East),
+                Some(ref mut promotion_menu) => {
+                    if promotion_menu.selected >= 3 {
+                        promotion_menu.selected = 0;
+                    } else {
+                        promotion_menu.selected += 1;
+                    }
+                }
+            },
             KeyCode::Enter => match app.game.view_state.selected_position {
                 None => app.game.select_piece(),
                 Some(_) => {
@@ -129,8 +159,14 @@ impl MessageHandler {
                                 .find(|m| m.to == cursor_position);
 
                             if let Some(m) = maybe_move {
-                                app.game.game_state.make_move(*m);
-                                app.game.view_state.currently_legal_moves.clear();
+                                if m.move_type == MoveType::Promotion {
+                                    app.game.view_state.promotion_menu = Some(PromotionMenu::new(
+                                        app.game.game_state.current_player.color,
+                                    ));
+                                } else {
+                                    app.game.game_state.make_move(*m);
+                                    app.game.view_state.currently_legal_moves.clear();
+                                }
                             }
                         }
                     }

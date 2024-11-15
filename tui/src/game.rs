@@ -1,12 +1,15 @@
 use std::fmt::Display;
 
-use domain::{game::GameState, pieces::Move, position::Position};
+use domain::{game::GameState, pieces::Move, position::Position, Color};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     Frame,
 };
 
-use crate::{app::Direction as CursorDirection, widgets::game::Debugger};
+use crate::{
+    app::Direction as CursorDirection,
+    widgets::{game::Debugger, promotion_menu::PromotionMenu},
+};
 
 #[derive(Debug, Clone)]
 pub struct Game {
@@ -110,6 +113,13 @@ impl Game {
             .split(main_layout_horizontal[1]);
 
         frame.render_stateful_widget(self.clone(), main_layout_vertical[1], &mut self.view_state);
+        if let Some(ref mut promotion_menu) = self.view_state.promotion_menu {
+            frame.render_stateful_widget(
+                promotion_menu.clone(),
+                main_layout_vertical[1],
+                &mut promotion_menu.selected,
+            );
+        }
         frame.render_stateful_widget(Debugger, main_layout_vertical[3], &mut self);
     }
 }
@@ -119,6 +129,7 @@ pub struct ViewState {
     pub cursor_position: Position,
     pub selected_position: Option<Position>,
     pub currently_legal_moves: Vec<Move>,
+    pub promotion_menu: Option<PromotionMenu>,
 }
 
 impl Default for ViewState {
@@ -127,6 +138,7 @@ impl Default for ViewState {
             cursor_position: Position { row: 6, column: 3 },
             selected_position: None,
             currently_legal_moves: vec![],
+            promotion_menu: None,
         }
     }
 }
