@@ -4,7 +4,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use domain::pieces::MoveType;
+use domain::pieces::{MoveType, PieceType};
 use ratatui::crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, MouseEvent};
 
 use crate::{
@@ -129,48 +129,72 @@ impl MessageHandler {
             },
             KeyCode::Enter => match app.game.view_state.selected_position {
                 None => app.game.select_piece(),
-                Some(_) => {
-                    let cursor_position = app.game.view_state.cursor_position;
+                Some(_) => match &app.game.view_state.promotion_menu {
+                    Some(promotion_menu) => {
+                        app.game.game_state.promotion_move = Some((
+                            promotion_menu.m,
+                            promotion_menu.pieces[promotion_menu.selected]
+                                .clone()
+                                .inner()
+                                .piece_type,
+                        ));
+                        app.game.game_state.make_move(promotion_menu.m);
+                        app.game.view_state.promotion_menu = None;
+                        app.game.view_state.currently_legal_moves.clear();
+                    }
+                    None => {
+                        let cursor_position = app.game.view_state.cursor_position;
 
-                    match app.game.game_state.board.get(&cursor_position) {
-                        None => {
-                            let maybe_move = app
-                                .game
-                                .view_state
-                                .currently_legal_moves
-                                .iter()
-                                .find(|m| m.to == cursor_position);
+                        match app.game.game_state.board.get(&cursor_position) {
+                            None => {
+                                let maybe_move = app
+                                    .game
+                                    .view_state
+                                    .currently_legal_moves
+                                    .iter()
+                                    .find(|m| m.to == cursor_position);
 
-                            if let Some(m) = maybe_move {
-                                app.game.game_state.make_move(*m);
-                                app.game.view_state.currently_legal_moves.clear();
+                                if let Some(m) = maybe_move {
+                                    if m.move_type == MoveType::Promotion {
+                                        app.game.view_state.promotion_menu =
+                                            Some(PromotionMenu::new(
+                                                app.game.game_state.current_player.color,
+                                                *m,
+                                            ));
+                                    } else {
+                                        app.game.game_state.make_move(*m);
+                                        app.game.view_state.currently_legal_moves.clear();
+                                    }
+                                }
                             }
-                        }
-                        Some(piece) => {
-                            if app.game.game_state.current_player.color == piece.piece_color {
-                                app.game.select_piece();
-                                return Ok(());
-                            }
-                            let maybe_move = app
-                                .game
-                                .view_state
-                                .currently_legal_moves
-                                .iter()
-                                .find(|m| m.to == cursor_position);
+                            Some(piece) => {
+                                if app.game.game_state.current_player.color == piece.piece_color {
+                                    app.game.select_piece();
+                                    return Ok(());
+                                }
+                                let maybe_move = app
+                                    .game
+                                    .view_state
+                                    .currently_legal_moves
+                                    .iter()
+                                    .find(|m| m.to == cursor_position);
 
-                            if let Some(m) = maybe_move {
-                                if m.move_type == MoveType::Promotion {
-                                    app.game.view_state.promotion_menu = Some(PromotionMenu::new(
-                                        app.game.game_state.current_player.color,
-                                    ));
-                                } else {
-                                    app.game.game_state.make_move(*m);
-                                    app.game.view_state.currently_legal_moves.clear();
+                                if let Some(m) = maybe_move {
+                                    if m.move_type == MoveType::Promotion {
+                                        app.game.view_state.promotion_menu =
+                                            Some(PromotionMenu::new(
+                                                app.game.game_state.current_player.color,
+                                                *m,
+                                            ));
+                                    } else {
+                                        app.game.game_state.make_move(*m);
+                                        app.game.view_state.currently_legal_moves.clear();
+                                    }
                                 }
                             }
                         }
                     }
-                }
+                },
             },
             _ => {}
         };

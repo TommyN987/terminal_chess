@@ -1,5 +1,5 @@
 use domain::{
-    pieces::{Bishop, Knight, Piece as DomainPiece, PieceType, Queen, Rook},
+    pieces::{Bishop, Knight, Move, Piece as DomainPiece, PieceType, Queen, Rook},
     Color as DomainColor,
 };
 use ratatui::{
@@ -15,10 +15,11 @@ use super::piece::Piece;
 pub struct PromotionMenu {
     pub pieces: [Piece; 4],
     pub selected: usize,
+    pub m: Move,
 }
 
 impl PromotionMenu {
-    pub fn new(piece_color: DomainColor) -> Self {
+    pub fn new(piece_color: DomainColor, m: Move) -> Self {
         Self {
             pieces: [
                 Piece::from(&DomainPiece::new(
@@ -33,6 +34,7 @@ impl PromotionMenu {
                 Piece::from(&DomainPiece::new(PieceType::Knight(Knight), piece_color)),
             ],
             selected: 0,
+            m,
         }
     }
 }

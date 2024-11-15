@@ -2,7 +2,7 @@ use derive_new::new;
 
 use crate::{board::Board, direction::Direction, player::Player, position::Position, Color};
 
-use super::{King, PieceType};
+use super::{King, Piece, PieceType};
 
 pub trait Moveable {
     fn get_moves(&self, color: Color, has_moved: bool, from: Position, board: &Board) -> Vec<Move>;
@@ -77,11 +77,19 @@ pub struct Move {
 }
 
 impl Move {
-    pub fn execute(&self, board: &mut Board) {
+    pub fn execute(&self, board: &mut Board, promotion_piece: Option<Piece>) {
         if let Some(mut piece) = board.get(&self.from) {
-            piece.has_moved = true;
-            board.set(&self.to, Some(piece));
-            board.set(&self.from, None);
+            match promotion_piece {
+                None => {
+                    piece.has_moved = true;
+                    board.set(&self.to, Some(piece));
+                    board.set(&self.from, None);
+                }
+                Some(new_piece) => {
+                    board.set(&self.to, Some(new_piece));
+                    board.set(&self.from, None);
+                }
+            }
         }
     }
 
@@ -89,7 +97,7 @@ impl Move {
         if let Some(piece) = board.get(&self.from) {
             let player = Player::new(piece.piece_color);
             let mut cloned_board = board.clone();
-            self.execute(&mut cloned_board);
+            self.execute(&mut cloned_board, None);
             return !cloned_board.is_in_check(player);
         }
         false
@@ -110,7 +118,7 @@ mod tests {
 
         let m = Move::new(MoveType::Normal, from, to);
 
-        m.execute(&mut board);
+        m.execute(&mut board, None);
 
         let mut moved_pawn = Piece::new(PieceType::Pawn(Pawn::new(Direction::North)), Color::White);
         moved_pawn.has_moved = true;

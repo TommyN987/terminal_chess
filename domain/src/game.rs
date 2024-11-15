@@ -1,6 +1,6 @@
 use crate::{
     board::Board,
-    pieces::{moveable::Move, Moveable, Piece},
+    pieces::{moveable::Move, Moveable, Piece, PieceType},
     player::Player,
     position::Position,
 };
@@ -9,6 +9,7 @@ use crate::{
 pub struct GameState {
     pub board: Board,
     pub current_player: Player,
+    pub promotion_move: Option<(Move, PieceType)>,
     pub result: Option<GameResult>,
 }
 
@@ -23,6 +24,7 @@ impl GameState {
         Self {
             board: Board::new(),
             current_player: Player::default(),
+            promotion_move: None,
             result: None,
         }
     }
@@ -48,7 +50,14 @@ impl GameState {
     }
 
     pub fn make_move(&mut self, m: Move) {
-        m.execute(&mut self.board);
+        match self.promotion_move {
+            None => m.execute(&mut self.board, None),
+            Some((m, piece_type)) => {
+                let promotion_piece = Piece::new(piece_type, self.current_player.color);
+                m.execute(&mut self.board, Some(promotion_piece));
+                self.promotion_move = None;
+            }
+        };
         self.current_player = self.current_player.opponent();
         self.check_for_game_over();
     }
