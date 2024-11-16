@@ -6,6 +6,7 @@ use tui::Tui;
 mod app;
 mod constants;
 mod game;
+mod handlers;
 mod menu;
 mod message_handler;
 mod tui;

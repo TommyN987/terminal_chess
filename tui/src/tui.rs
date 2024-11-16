@@ -17,7 +17,6 @@ use crate::{
     message_handler::MessageHandler,
 };
 
-#[derive(Debug)]
 pub struct Tui<B: Backend> {
     terminal: Terminal<B>,
     pub message_handler: MessageHandler,

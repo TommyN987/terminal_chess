@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use domain::{game::GameState, pieces::Move, position::Position, Color};
+use domain::{game::GameState, pieces::Move, position::Position};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     Frame,
@@ -11,7 +11,7 @@ use crate::{
     widgets::{game::Debugger, promotion_menu::PromotionMenu},
 };
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Game {
     pub game_state: GameState,
     pub view_state: ViewState,

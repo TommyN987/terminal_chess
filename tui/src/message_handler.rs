@@ -1,15 +1,15 @@
 use std::{
+    collections::HashMap,
     sync::mpsc,
     thread,
     time::{Duration, Instant},
 };
 
-use domain::pieces::{MoveType, PieceType};
 use ratatui::crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, MouseEvent};
 
 use crate::{
-    app::{App, AppResult, CurrentScreen, Direction},
-    widgets::promotion_menu::PromotionMenu,
+    app::{App, AppResult, Direction, EventContext},
+    handlers::strategies::{GameHandler, KeyEventHandler, MainMenuHandler, PromotionMenuHandler},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -20,11 +20,11 @@ pub enum Message {
     MousePress(MouseEvent),
 }
 
-#[derive(Debug)]
 pub struct MessageHandler {
     sender: mpsc::Sender<Message>,
     receiver: mpsc::Receiver<Message>,
     handler: thread::JoinHandle<()>,
+    key_event_handlers: HashMap<EventContext, Box<dyn KeyEventHandler>>,
 }
 
 impl MessageHandler {
@@ -59,10 +59,23 @@ impl MessageHandler {
             })
         };
 
+        let mut key_event_handlers: HashMap<EventContext, Box<dyn KeyEventHandler>> =
+            HashMap::new();
+
+        key_event_handlers.insert(
+            EventContext::PromotionMenu,
+            Box::new(PromotionMenuHandler::new()),
+        );
+
+        key_event_handlers.insert(EventContext::Game, Box::new(GameHandler::new()));
+
+        key_event_handlers.insert(EventContext::MainMenu, Box::new(MainMenuHandler::new()));
+
         Self {
             sender,
             receiver,
             handler,
+            key_event_handlers,
         }
     }
 
@@ -75,11 +88,11 @@ impl MessageHandler {
             return Ok(());
         }
 
-        match app.current_screen {
-            CurrentScreen::Menu => self.handle_menu_key_events(key_event, app),
-            CurrentScreen::Game => self.handle_game_key_events(key_event, app),
-            _ => Ok(()),
+        if let Some(handler) = self.key_event_handlers.get(&app.event_context) {
+            handler.handle_key_event(key_event, app);
         }
+
+        Ok(())
     }
 
     fn handle_menu_key_events(&self, key_event: KeyEvent, app: &mut App) -> AppResult<()> {
@@ -91,113 +104,6 @@ impl MessageHandler {
             _ => {}
         }
 
-        Ok(())
-    }
-
-    fn handle_game_key_events(&self, key_event: KeyEvent, app: &mut App) -> AppResult<()> {
-        match key_event.code {
-            KeyCode::Char('q') => app.quit(),
-            KeyCode::Up | KeyCode::Char('k') => {
-                if app.game.view_state.promotion_menu.is_none() {
-                    app.game.move_cursor(Direction::North)
-                }
-            }
-            KeyCode::Down | KeyCode::Char('j') => {
-                if app.game.view_state.promotion_menu.is_none() {
-                    app.game.move_cursor(Direction::South)
-                }
-            }
-            KeyCode::Left | KeyCode::Char('h') => match app.game.view_state.promotion_menu {
-                None => app.game.move_cursor(Direction::West),
-                Some(ref mut promotion_menu) => {
-                    if promotion_menu.selected <= 0 {
-                        promotion_menu.selected = 3;
-                    } else {
-                        promotion_menu.selected -= 1;
-                    }
-                }
-            },
-            KeyCode::Right | KeyCode::Char('l') => match app.game.view_state.promotion_menu {
-                None => app.game.move_cursor(Direction::East),
-                Some(ref mut promotion_menu) => {
-                    if promotion_menu.selected >= 3 {
-                        promotion_menu.selected = 0;
-                    } else {
-                        promotion_menu.selected += 1;
-                    }
-                }
-            },
-            KeyCode::Enter => match app.game.view_state.selected_position {
-                None => app.game.select_piece(),
-                Some(_) => match &app.game.view_state.promotion_menu {
-                    Some(promotion_menu) => {
-                        app.game.game_state.promotion_move = Some((
-                            promotion_menu.m,
-                            promotion_menu.pieces[promotion_menu.selected]
-                                .clone()
-                                .inner()
-                                .piece_type,
-                        ));
-                        app.game.game_state.make_move(promotion_menu.m);
-                        app.game.view_state.promotion_menu = None;
-                        app.game.view_state.currently_legal_moves.clear();
-                    }
-                    None => {
-                        let cursor_position = app.game.view_state.cursor_position;
-
-                        match app.game.game_state.board.get(&cursor_position) {
-                            None => {
-                                let maybe_move = app
-                                    .game
-                                    .view_state
-                                    .currently_legal_moves
-                                    .iter()
-                                    .find(|m| m.to == cursor_position);
-
-                                if let Some(m) = maybe_move {
-                                    if m.move_type == MoveType::Promotion {
-                                        app.game.view_state.promotion_menu =
-                                            Some(PromotionMenu::new(
-                                                app.game.game_state.current_player.color,
-                                                *m,
-                                            ));
-                                    } else {
-                                        app.game.game_state.make_move(*m);
-                                        app.game.view_state.currently_legal_moves.clear();
-                                    }
-                                }
-                            }
-                            Some(piece) => {
-                                if app.game.game_state.current_player.color == piece.piece_color {
-                                    app.game.select_piece();
-                                    return Ok(());
-                                }
-                                let maybe_move = app
-                                    .game
-                                    .view_state
-                                    .currently_legal_moves
-                                    .iter()
-                                    .find(|m| m.to == cursor_position);
-
-                                if let Some(m) = maybe_move {
-                                    if m.move_type == MoveType::Promotion {
-                                        app.game.view_state.promotion_menu =
-                                            Some(PromotionMenu::new(
-                                                app.game.game_state.current_player.color,
-                                                *m,
-                                            ));
-                                    } else {
-                                        app.game.game_state.make_move(*m);
-                                        app.game.view_state.currently_legal_moves.clear();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-            },
-            _ => {}
-        };
         Ok(())
     }
 }

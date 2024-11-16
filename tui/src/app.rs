@@ -8,6 +8,7 @@ pub struct App {
     pub current_screen: CurrentScreen,
     pub menu: Menu,
     pub game: Game,
+    pub event_context: EventContext,
 }
 
 impl Default for App {
@@ -17,6 +18,7 @@ impl Default for App {
             current_screen: CurrentScreen::Menu,
             menu: Menu::default(),
             game: Game::new(GameState::new()),
+            event_context: EventContext::MainMenu,
         }
     }
 }
@@ -24,6 +26,7 @@ impl Default for App {
 impl App {
     pub fn run(&mut self) {
         self.current_screen = CurrentScreen::Game;
+        self.event_context = EventContext::Game;
         while self.game.is_running == false {
             self.current_screen = CurrentScreen::Menu;
         }
@@ -60,6 +63,14 @@ pub enum CurrentScreen {
     Exit,
 }
 
+#[derive(PartialEq, Eq, Hash)]
+pub enum EventContext {
+    MainMenu,
+    Game,
+    PromotionMenu,
+}
+
+#[derive(Debug, Clone)]
 pub enum Direction {
     North,
     South,
