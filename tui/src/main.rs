@@ -34,6 +34,5 @@ fn main() -> AppResult<()> {
     }
 
     tui.exit()?;
-
     Ok(())
 }

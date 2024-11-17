@@ -36,8 +36,11 @@ impl Command for PromotionMenuEnterCommand {
             app.game.game_state.promotion_move = Some((promotion_menu.m, selected_piece_type));
             app.game.game_state.make_move(promotion_menu.m);
             app.game.view_state.promotion_menu = None;
-            app.event_context = EventContext::Game;
             app.game.view_state.currently_legal_moves.clear();
+            match app.game.game_state.is_game_over() {
+                true => app.event_context = EventContext::GameOver,
+                false => app.event_context = EventContext::Game,
+            }
         }
 
         Ok(())

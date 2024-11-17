@@ -56,6 +56,9 @@ impl BoardEnterCommand {
             } else {
                 app.game.game_state.make_move(m);
                 app.game.view_state.currently_legal_moves.clear();
+                if app.game.game_state.is_game_over() {
+                    app.event_context = EventContext::GameOver;
+                }
             }
         }
 

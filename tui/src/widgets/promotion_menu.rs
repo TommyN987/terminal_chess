@@ -48,9 +48,9 @@ impl StatefulWidget for PromotionMenu {
             .direction(Direction::Vertical)
             .constraints(
                 [
-                    Constraint::Percentage(45),
-                    Constraint::Min(8),
-                    Constraint::Percentage(45),
+                    Constraint::Percentage(50),
+                    Constraint::Length(8),
+                    Constraint::Percentage(50),
                 ]
                 .as_ref(),
             )

@@ -53,7 +53,7 @@ impl<B: Backend> Tui<B> {
         Ok(())
     }
 
-    pub fn exit(&mut self) -> AppResult<()> {
+    pub fn exit(mut self) -> AppResult<()> {
         Self::reset()?;
         self.terminal.show_cursor()?;
         Ok(())

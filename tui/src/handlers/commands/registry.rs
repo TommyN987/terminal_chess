@@ -5,9 +5,9 @@ use ratatui::crossterm::event::{KeyCode, KeyEvent};
 use crate::app::Direction;
 
 use super::{
-    BoardEnterCommand, BoardNavigationCommand, Command, CommandBox, MainMenuEnterCommand,
-    MainMenuNavigationCommand, PromotionMenuEnterCommand, PromotionMenuNavigationCommand,
-    QuitCommand,
+    BackToMainMenuCommand, BoardEnterCommand, BoardNavigationCommand, Command, CommandBox,
+    MainMenuEnterCommand, MainMenuNavigationCommand, PromotionMenuEnterCommand,
+    PromotionMenuNavigationCommand, QuitCommand,
 };
 
 #[derive(Clone)]
@@ -45,9 +45,7 @@ impl CommandRegistry {
 
         registry
     }
-}
 
-impl CommandRegistry {
     pub fn init_promotion_menu_registry() -> Self {
         let mut registry = Self::new();
 
@@ -64,9 +62,15 @@ impl CommandRegistry {
 
         registry
     }
-}
 
-impl CommandRegistry {
+    pub fn init_game_over_registry() -> Self {
+        let mut registry = Self::new();
+
+        registry.register(KeyEvent::from(KeyCode::Enter), BackToMainMenuCommand);
+
+        registry
+    }
+
     pub fn init_game_registry() -> Self {
         let mut registry = Self::new();
 

@@ -68,6 +68,7 @@ pub enum EventContext {
     MainMenu,
     Game,
     PromotionMenu,
+    GameOver,
 }
 
 #[derive(Debug, Clone)]

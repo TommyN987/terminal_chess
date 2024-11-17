@@ -5,11 +5,13 @@ use std::{
     time::{Duration, Instant},
 };
 
-use ratatui::crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, MouseEvent};
+use ratatui::crossterm::event::{self, Event, KeyEvent, KeyEventKind, MouseEvent};
 
 use crate::{
-    app::{App, AppResult, Direction, EventContext},
-    handlers::strategies::{GameHandler, KeyEventHandler, MainMenuHandler, PromotionMenuHandler},
+    app::{App, AppResult, EventContext},
+    handlers::strategies::{
+        GameHandler, GameOverHandler, KeyEventHandler, MainMenuHandler, PromotionMenuHandler,
+    },
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -71,6 +73,8 @@ impl MessageHandler {
 
         key_event_handlers.insert(EventContext::MainMenu, Box::new(MainMenuHandler::new()));
 
+        key_event_handlers.insert(EventContext::GameOver, Box::new(GameOverHandler::new()));
+
         Self {
             sender,
             receiver,
@@ -89,19 +93,7 @@ impl MessageHandler {
         }
 
         if let Some(handler) = self.key_event_handlers.get(&app.event_context) {
-            handler.handle_key_event(key_event, app);
-        }
-
-        Ok(())
-    }
-
-    fn handle_menu_key_events(&self, key_event: KeyEvent, app: &mut App) -> AppResult<()> {
-        match key_event.code {
-            KeyCode::Char('q') => app.quit(),
-            KeyCode::Up | KeyCode::Char('k') => app.move_menu_cursor(Direction::North),
-            KeyCode::Down | KeyCode::Char('j') => app.move_menu_cursor(Direction::South),
-            KeyCode::Enter => app.run(),
-            _ => {}
+            handler.handle_key_event(key_event, app)?;
         }
 
         Ok(())

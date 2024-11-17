@@ -1,8 +1,10 @@
 pub mod game;
+pub mod game_over;
 pub mod main_menu;
 pub mod promotion_menu;
 
 pub use game::*;
+pub use game_over::*;
 pub use main_menu::*;
 pub use promotion_menu::*;
 
