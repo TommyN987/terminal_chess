@@ -79,21 +79,53 @@ pub struct Move {
 impl Move {
     pub fn execute(&self, board: &mut Board, promotion_piece: Option<Piece>) {
         if let Some(mut piece) = board.get(&self.from) {
-            match promotion_piece {
-                None => {
-                    piece.has_moved = true;
-                    board.set(&self.to, Some(piece));
-                    board.set(&self.from, None);
+            match self.move_type {
+                MoveType::ShortCastle => {
+                    let rook_move = Move::new(
+                        MoveType::Normal,
+                        Position::from((self.from.row, 7)),
+                        Position::from((self.from.row, 5)),
+                    );
+                    let mut king_move = self.clone();
+                    king_move.move_type = MoveType::Normal;
+                    king_move.execute(board, None);
+                    rook_move.execute(board, None);
                 }
-                Some(new_piece) => {
-                    board.set(&self.to, Some(new_piece));
-                    board.set(&self.from, None);
+                MoveType::LongCastle => {
+                    let rook_move = Move::new(
+                        MoveType::Normal,
+                        Position::from((self.from.row, 0)),
+                        Position::from((self.from.row, 3)),
+                    );
+                    let mut king_move = self.clone();
+                    king_move.move_type = MoveType::Normal;
+                    king_move.execute(board, None);
+                    rook_move.execute(board, None);
                 }
+                _ => match promotion_piece {
+                    None => {
+                        piece.has_moved = true;
+                        board.set(&self.to, Some(piece));
+                        board.set(&self.from, None);
+                    }
+                    Some(new_piece) => {
+                        board.set(&self.to, Some(new_piece));
+                        board.set(&self.from, None);
+                    }
+                },
             }
         }
     }
 
     pub fn is_legal(&self, board: &Board) -> bool {
+        match self.move_type {
+            MoveType::ShortCastle => self.is_short_castling_legal(board),
+            MoveType::LongCastle => self.is_long_castling_legal(board),
+            _ => self.is_normal_move_legal(board),
+        }
+    }
+
+    fn is_normal_move_legal(&self, board: &Board) -> bool {
         if let Some(piece) = board.get(&self.from) {
             let player = Player::new(piece.piece_color);
             let mut cloned_board = board.clone();
@@ -101,6 +133,46 @@ impl Move {
             return !cloned_board.is_in_check(player);
         }
         false
+    }
+
+    fn is_short_castling_legal(&self, board: &Board) -> bool {
+        let mut is_legal = false;
+        if let Some(piece) = board.get(&self.from) {
+            let player = Player::new(piece.piece_color);
+            let columns = [5, 6];
+
+            is_legal = columns.into_iter().all(|column| {
+                let mut cloned_board = board.clone();
+                let between_move = Move::new(
+                    MoveType::Normal,
+                    self.from,
+                    Position::new(self.to.row, column),
+                );
+                between_move.execute(&mut cloned_board, None);
+                !cloned_board.is_in_check(player)
+            }) && !board.is_in_check(player);
+        }
+        is_legal
+    }
+
+    fn is_long_castling_legal(&self, board: &Board) -> bool {
+        let mut is_legal = false;
+        if let Some(piece) = board.get(&self.from) {
+            let player = Player::new(piece.piece_color);
+            let columns = [2, 3];
+
+            is_legal = columns.into_iter().all(|column| {
+                let mut cloned_board = board.clone();
+                let between_move = Move::new(
+                    MoveType::Normal,
+                    self.from,
+                    Position::new(self.to.row, column),
+                );
+                between_move.execute(&mut cloned_board, None);
+                !cloned_board.is_in_check(player)
+            }) && !board.is_in_check(player);
+        }
+        is_legal
     }
 }
 

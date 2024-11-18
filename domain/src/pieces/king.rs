@@ -125,8 +125,8 @@ impl King {
 
     fn can_long_castle(&self, has_moved: bool, from: &Position, board: &Board) -> bool {
         let Position { row, column: _ } = from.clone();
-        let rook_position = Position::from((row, 7));
-        let between_positions = (1..=4)
+        let rook_position = Position::from((row, 0));
+        let between_positions = (1..=3)
             .into_iter()
             .map(|col| Position::from((row, col as i8)))
             .collect();
