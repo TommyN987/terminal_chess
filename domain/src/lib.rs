@@ -10,3 +10,12 @@ pub enum Color {
     White,
     Black,
 }
+
+impl Color {
+    pub fn opponent(&self) -> Self {
+        match self {
+            Color::White => Color::Black,
+            Color::Black => Color::White,
+        }
+    }
+}

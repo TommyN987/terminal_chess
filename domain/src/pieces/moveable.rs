@@ -102,6 +102,16 @@ impl Move {
                     king_move.execute(board, None);
                     rook_move.execute(board, None);
                 }
+                MoveType::DoublePawn => {
+                    board.set_en_passant_square(&self, &piece.piece_color);
+                    board.set(&self.to, Some(piece));
+                    board.set(&self.from, None);
+                }
+                MoveType::EnPassant => {
+                    board.set(&self.to, Some(piece));
+                    board.set(&self.from, None);
+                    board.set(&Position::from((self.from.row, self.to.column)), None);
+                }
                 _ => match promotion_piece {
                     None => {
                         piece.has_moved = true;
@@ -114,6 +124,10 @@ impl Move {
                     }
                 },
             }
+        }
+
+        if self.move_type != MoveType::DoublePawn {
+            board.clear_en_passant_squares();
         }
     }
 

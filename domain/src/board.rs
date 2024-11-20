@@ -1,16 +1,25 @@
 use std::fmt::Display;
 
+use derive_new::new;
+
 use crate::{
     direction::Direction,
-    pieces::{Bishop, King, Knight, Moveable, Pawn, Piece, PieceType, Queen, Rook},
+    pieces::{Bishop, King, Knight, Move, Moveable, Pawn, Piece, PieceType, Queen, Rook},
     player::Player,
     position::Position,
     Color,
 };
 
+#[derive(Debug, Default, Clone, PartialEq, new)]
+pub struct EnPassantSquare {
+    white: Option<Position>,
+    black: Option<Position>,
+}
+
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct Board {
     pub fields: [[Option<Piece>; 8]; 8],
+    en_passant_square: EnPassantSquare,
 }
 
 impl Display for Board {
@@ -78,6 +87,32 @@ impl Board {
                 Some(piece) => piece.piece_color == player.color,
             })
             .collect()
+    }
+
+    pub fn get_en_passant_square(&self, player: &Color) -> Option<Position> {
+        match player {
+            Color::White => self.en_passant_square.white,
+            Color::Black => self.en_passant_square.black,
+        }
+    }
+
+    pub fn set_en_passant_square(&mut self, m: &Move, player: &Color) {
+        let en_passant_square = Position::from(((m.from.row + m.to.row) / 2, m.to.column));
+        match player {
+            Color::White => {
+                self.en_passant_square.white = Some(en_passant_square);
+                self.en_passant_square.black = None;
+            }
+            Color::Black => {
+                self.en_passant_square.black = Some(en_passant_square);
+                self.en_passant_square.white = None;
+            }
+        }
+    }
+
+    pub fn clear_en_passant_squares(&mut self) {
+        self.en_passant_square.black = None;
+        self.en_passant_square.white = None;
     }
 }
 

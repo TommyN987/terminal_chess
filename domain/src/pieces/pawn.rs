@@ -79,7 +79,11 @@ impl Pawn {
         for dir in [Direction::East, Direction::West] {
             let to = from + self.forward + dir;
 
-            if self.can_capture_at(color, &to, board) {
+            if let Some(en_passant_square) = board.get_en_passant_square(&color.opponent()) {
+                if to == en_passant_square {
+                    result.push(Move::new(MoveType::EnPassant, from, to));
+                }
+            } else if self.can_capture_at(color, &to, board) {
                 result.push(Move::new(self.derive_move_type(&to), from, to));
             }
         }
