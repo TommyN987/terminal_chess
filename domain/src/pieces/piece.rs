@@ -65,6 +65,19 @@ pub enum PieceType {
     King(King),
 }
 
+impl PieceType {
+    pub fn as_index(&self) -> usize {
+        match self {
+            PieceType::Pawn(_) => 0,
+            PieceType::Knight(_) => 1,
+            PieceType::Bishop(_) => 2,
+            PieceType::Rook(_) => 3,
+            PieceType::Queen(_) => 4,
+            PieceType::King(_) => 5,
+        }
+    }
+}
+
 impl PartialEq for PieceType {
     fn eq(&self, other: &Self) -> bool {
         matches!(
@@ -76,6 +89,42 @@ impl PartialEq for PieceType {
                 | (PieceType::Queen(_), PieceType::Queen(_))
                 | (PieceType::Knight(_), PieceType::Knight(_))
         )
+    }
+}
+
+pub struct PieceCounter {
+    white: [u8; 6],
+    black: [u8; 6],
+    total: u8,
+}
+
+impl PieceCounter {
+    pub fn new() -> Self {
+        Self {
+            white: [0; 6],
+            black: [0; 6],
+            total: 0,
+        }
+    }
+
+    pub fn increment(&mut self, color: &Color, piece: &PieceType) {
+        match color {
+            Color::White => self.white[piece.as_index()] += 1,
+            Color::Black => self.black[piece.as_index()] += 1,
+        };
+        self.total += 1;
+    }
+
+    pub fn get_white(&self, piece: &PieceType) -> u8 {
+        self.white[piece.as_index()]
+    }
+
+    pub fn get_black(&self, piece: &PieceType) -> u8 {
+        self.black[piece.as_index()]
+    }
+
+    pub fn get_total(&self) -> u8 {
+        self.total
     }
 }
 

@@ -4,7 +4,10 @@ use derive_new::new;
 
 use crate::{
     direction::Direction,
-    pieces::{Bishop, King, Knight, Move, Moveable, Pawn, Piece, PieceType, Queen, Rook},
+    insufficient_material::InsufficientMaterial,
+    pieces::{
+        Bishop, King, Knight, Move, Moveable, Pawn, Piece, PieceCounter, PieceType, Queen, Rook,
+    },
     player::Player,
     position::Position,
     Color,
@@ -87,6 +90,22 @@ impl Board {
                 Some(piece) => piece.piece_color == player.color,
             })
             .collect()
+    }
+
+    pub fn insufficient_material(&self) -> bool {
+        let piece_counter = self.count_pieces();
+        *InsufficientMaterial::derive(&piece_counter)
+    }
+
+    fn count_pieces(&self) -> PieceCounter {
+        self.piece_positions()
+            .iter()
+            .fold(PieceCounter::new(), |mut acc, pos| {
+                if let Some(piece) = self.get(pos) {
+                    acc.increment(&piece.piece_color, &piece.piece_type);
+                }
+                acc
+            })
     }
 
     pub fn get_en_passant_square(&self, player: &Color) -> Option<Position> {

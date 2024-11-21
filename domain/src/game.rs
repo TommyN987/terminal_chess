@@ -94,6 +94,10 @@ impl GameState {
                 self.result = Some(GameResult::draw(EndReason::Stalemate));
             }
         }
+
+        if self.board.insufficient_material() {
+            self.result = Some(GameResult::draw(EndReason::InsufficientMaterial));
+        }
     }
 }
 

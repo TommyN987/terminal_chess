@@ -1,6 +1,7 @@
 pub mod board;
 pub mod direction;
 pub mod game;
+pub mod insufficient_material;
 pub mod pieces;
 pub mod player;
 pub mod position;
