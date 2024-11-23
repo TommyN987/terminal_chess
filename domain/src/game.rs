@@ -10,6 +10,7 @@ pub struct GameState {
     pub board: Board,
     pub current_player: Player,
     pub promotion_move: Option<(Move, PieceType)>,
+    pub non_capture_or_pawn_move_counter: u8,
     pub result: Option<GameResult>,
 }
 
@@ -25,6 +26,7 @@ impl GameState {
             board: Board::new(),
             current_player: Player::default(),
             promotion_move: None,
+            non_capture_or_pawn_move_counter: 0,
             result: None,
         }
     }
@@ -51,10 +53,22 @@ impl GameState {
 
     pub fn make_move(&mut self, m: Move) {
         match self.promotion_move {
-            None => m.execute(&mut self.board, None),
+            None => {
+                let is_capture_or_pawn_move = m.execute(&mut self.board, None);
+                if is_capture_or_pawn_move {
+                    self.non_capture_or_pawn_move_counter = 0;
+                } else {
+                    self.non_capture_or_pawn_move_counter += 1;
+                }
+            }
             Some((m, piece_type)) => {
                 let promotion_piece = Piece::new(piece_type, self.current_player.color);
-                m.execute(&mut self.board, Some(promotion_piece));
+                let is_capture_or_pawn_move = m.execute(&mut self.board, Some(promotion_piece));
+                if is_capture_or_pawn_move {
+                    self.non_capture_or_pawn_move_counter = 0;
+                } else {
+                    self.non_capture_or_pawn_move_counter += 1;
+                }
                 self.promotion_move = None;
             }
         };
@@ -98,6 +112,14 @@ impl GameState {
         if self.board.insufficient_material() {
             self.result = Some(GameResult::draw(EndReason::InsufficientMaterial));
         }
+
+        if self.fifty_move_rule() {
+            self.result = Some(GameResult::draw(EndReason::FiftyMoveRule));
+        }
+    }
+
+    fn fifty_move_rule(&self) -> bool {
+        self.non_capture_or_pawn_move_counter >= 100
     }
 }
 

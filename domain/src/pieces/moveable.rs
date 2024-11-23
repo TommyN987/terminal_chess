@@ -2,7 +2,7 @@ use derive_new::new;
 
 use crate::{board::Board, direction::Direction, player::Player, position::Position, Color};
 
-use super::{King, Piece, PieceType};
+use super::{King, Pawn, Piece, PieceType};
 
 pub trait Moveable {
     fn get_moves(&self, color: Color, has_moved: bool, from: Position, board: &Board) -> Vec<Move>;
@@ -77,9 +77,16 @@ pub struct Move {
 }
 
 impl Move {
-    pub fn execute(&self, board: &mut Board, promotion_piece: Option<Piece>) {
+    pub fn execute(&self, board: &mut Board, promotion_piece: Option<Piece>) -> bool {
+        let is_capture = board.get(&self.to).is_some();
+        let mut is_pawn_move = false;
+
         if let Some(mut piece) = board.get(&self.from) {
             piece.has_moved = true;
+            if piece.piece_type == PieceType::Pawn(Pawn::new(Direction::North)) {
+                is_pawn_move = true;
+            }
+
             match self.move_type {
                 MoveType::ShortCastle => {
                     let rook_move = Move::new(
@@ -130,6 +137,8 @@ impl Move {
         if self.move_type != MoveType::DoublePawn {
             board.clear_en_passant_squares();
         }
+
+        is_capture || is_pawn_move
     }
 
     pub fn is_legal(&self, board: &Board) -> bool {
