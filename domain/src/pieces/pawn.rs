@@ -64,10 +64,12 @@ impl Pawn {
                 one_move_position,
             ));
 
-            let two_move_position = one_move_position + self.forward;
+            if !has_moved {
+                let two_move_position = one_move_position + self.forward;
 
-            if !has_moved && self.can_move_to(&two_move_position, board) {
-                result.push(Move::new(MoveType::DoublePawn, from, two_move_position));
+                if self.can_move_to(&two_move_position, board) {
+                    result.push(Move::new(MoveType::DoublePawn, from, two_move_position));
+                }
             }
         }
 
@@ -82,8 +84,11 @@ impl Pawn {
             if let Some(en_passant_square) = board.get_en_passant_square(&color.opponent()) {
                 if to == en_passant_square {
                     result.push(Move::new(MoveType::EnPassant, from, to));
+                    continue;
                 }
-            } else if self.can_capture_at(color, &to, board) {
+            }
+
+            if self.can_capture_at(color, &to, board) {
                 result.push(Move::new(self.derive_move_type(&to), from, to));
             }
         }

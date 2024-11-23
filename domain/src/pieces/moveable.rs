@@ -79,6 +79,7 @@ pub struct Move {
 impl Move {
     pub fn execute(&self, board: &mut Board, promotion_piece: Option<Piece>) {
         if let Some(mut piece) = board.get(&self.from) {
+            piece.has_moved = true;
             match self.move_type {
                 MoveType::ShortCastle => {
                     let rook_move = Move::new(
