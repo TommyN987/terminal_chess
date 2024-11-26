@@ -85,10 +85,9 @@ impl King {
     }
 
     fn can_short_castle(&self, has_moved: bool, from: &Position, board: &Board) -> bool {
-        let Position { row, column: _ } = from.clone();
+        let Position { row, column: _ } = *from;
         let rook_position = Position::from((row, 7));
         let between_positions = (5..=6)
-            .into_iter()
             .map(|col| Position::from((row, col as i8)))
             .collect();
 
@@ -98,17 +97,16 @@ impl King {
             Player::new(Color::Black)
         };
 
-        self.is_rook_unmoved(&rook_position, &board)
-            && self.are_castling_squares_empty(between_positions, &board)
+        self.is_rook_unmoved(&rook_position, board)
+            && self.are_castling_squares_empty(between_positions, board)
             && !board.is_in_check(player)
             && !has_moved
     }
 
     fn can_long_castle(&self, has_moved: bool, from: &Position, board: &Board) -> bool {
-        let Position { row, column: _ } = from.clone();
+        let Position { row, column: _ } = *from;
         let rook_position = Position::from((row, 0));
         let between_positions = (1..=3)
-            .into_iter()
             .map(|col| Position::from((row, col as i8)))
             .collect();
 
@@ -118,8 +116,8 @@ impl King {
             Player::new(Color::Black)
         };
 
-        self.is_rook_unmoved(&rook_position, &board)
-            && self.are_castling_squares_empty(between_positions, &board)
+        self.is_rook_unmoved(&rook_position, board)
+            && self.are_castling_squares_empty(between_positions, board)
             && !board.is_in_check(player)
             && !has_moved
     }

@@ -169,6 +169,12 @@ pub struct PieceCounter {
     total: u8,
 }
 
+impl Default for PieceCounter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PieceCounter {
     pub fn new() -> Self {
         Self {

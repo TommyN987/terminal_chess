@@ -5,6 +5,7 @@ use crate::{
 
 use super::{Board, Direction, Position};
 
+#[derive(Default)]
 pub struct BoardBuilder {
     board: Board,
 }
