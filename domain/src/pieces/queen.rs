@@ -1,36 +1,24 @@
-use crate::{board::Board, direction::Direction, position::Position, Color};
-
-use super::moveable::{Move, MoveType, Moveable};
+use crate::{
+    board::{Board, Direction, Position},
+    moves::{Move, MoveType, Moveable},
+    Color,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Queen {
-    directions: [Direction; 8],
-}
-
-impl Default for Queen {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Queen {
-    pub fn new() -> Self {
-        Self {
-            directions: [
-                Direction::North,
-                Direction::South,
-                Direction::East,
-                Direction::West,
-                Direction::NorthEast,
-                Direction::NorthWest,
-                Direction::SouthEast,
-                Direction::SouthWest,
-            ],
-        }
-    }
-}
+pub struct Queen;
 
 impl Moveable for Queen {
+    const DIRECTIONS: &'static [Direction] = &[
+        Direction::North,
+        Direction::South,
+        Direction::East,
+        Direction::West,
+        Direction::NorthEast,
+        Direction::NorthWest,
+        Direction::SouthEast,
+        Direction::SouthWest,
+    ];
+
     fn get_moves(
         &self,
         _color: Color,
@@ -38,7 +26,7 @@ impl Moveable for Queen {
         from: Position,
         board: &Board,
     ) -> Vec<Move> {
-        self.reachable_positions_in_many_directions(from, board, &self.directions)
+        self.reachable_positions_in_many_directions(from, board)
             .into_iter()
             .map(|pos| Move::new(MoveType::Normal, from, pos))
             .collect()
@@ -57,11 +45,11 @@ mod tests {
 
         let mut board = Board::default();
         let queen_position = Position::from((4, 4));
-        let queen = Queen::new();
+        let queen = Queen;
 
         board.set(
             &queen_position,
-            Some(Piece::new(PieceType::Queen(Queen::new()), Color::White)),
+            Some(Piece::new(PieceType::Queen(Queen), Color::White)),
         );
 
         // Act
@@ -115,7 +103,7 @@ mod tests {
     fn test_queen_blocked_by_same_color() {
         // Arrange
         let board = Board::new();
-        let queen = Queen::new();
+        let queen = Queen;
         let queen_position = Position::from((7, 7));
 
         // Act
@@ -129,18 +117,18 @@ mod tests {
     fn test_queen_can_capture_opponent_piece() {
         // Arrange
         let mut board = Board::default();
-        let queen = Queen::new();
+        let queen = Queen;
         let queen_position = Position::from((4, 4));
         let opponent_position = Position::from((4, 5));
 
         board.set(
             &queen_position,
-            Some(Piece::new(PieceType::Queen(Queen::new()), Color::White)),
+            Some(Piece::new(PieceType::Queen(Queen), Color::White)),
         );
 
         board.set(
             &opponent_position,
-            Some(Piece::new(PieceType::Queen(Queen::new()), Color::Black)),
+            Some(Piece::new(PieceType::Queen(Queen), Color::Black)),
         );
 
         // Act

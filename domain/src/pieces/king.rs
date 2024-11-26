@@ -1,46 +1,28 @@
-use crate::{board::Board, direction::Direction, player::Player, position::Position, Color};
-
-use super::{
-    moveable::{Move, MoveType, Moveable},
-    PieceType,
+use crate::{
+    board::{Board, Direction, Position},
+    moves::{Move, MoveType, Moveable},
+    player::Player,
+    Color,
 };
 
+use super::PieceType;
+
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct King {
-    pub directions: [Direction; 8],
-}
-
-impl Default for King {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl King {
-    pub fn new() -> Self {
-        Self {
-            directions: [
-                Direction::North,
-                Direction::South,
-                Direction::East,
-                Direction::West,
-                Direction::NorthEast,
-                Direction::NorthWest,
-                Direction::SouthEast,
-                Direction::SouthWest,
-            ],
-        }
-    }
-}
+pub struct King;
 
 impl Moveable for King {
-    fn get_moves(
-        &self,
-        color: Color,
-        has_moved: bool,
-        from: Position,
-        board: &Board,
-    ) -> Vec<super::moveable::Move> {
+    const DIRECTIONS: &'static [Direction] = &[
+        Direction::North,
+        Direction::South,
+        Direction::East,
+        Direction::West,
+        Direction::NorthEast,
+        Direction::NorthWest,
+        Direction::SouthEast,
+        Direction::SouthWest,
+    ];
+
+    fn get_moves(&self, color: Color, has_moved: bool, from: Position, board: &Board) -> Vec<Move> {
         let mut moves: Vec<Move> = self
             .move_positions(color, from, board)
             .into_iter()
@@ -77,14 +59,14 @@ impl Moveable for King {
             .iter()
             .any(|pos| match board.get(pos) {
                 None => false,
-                Some(piece) => piece.piece_type == PieceType::King(King::default()),
+                Some(piece) => piece.piece_type == PieceType::King(King),
             })
     }
 }
 
 impl King {
     fn move_positions(&self, color: Color, from: Position, board: &Board) -> Vec<Position> {
-        self.directions
+        Self::DIRECTIONS
             .iter()
             .filter_map(|dir| {
                 let to = from + *dir;
@@ -165,12 +147,12 @@ mod tests {
     fn test_king_unblocked_moves() {
         // Arrange
         let mut board = Board::default();
-        let king = King::new();
+        let king = King;
         let king_position = Position::from((4, 4));
 
         board.set(
             &king_position,
-            Some(Piece::new(PieceType::King(King::new()), Color::White)),
+            Some(Piece::new(PieceType::King(King), Color::White)),
         );
 
         // Act
@@ -200,15 +182,15 @@ mod tests {
     #[test]
     fn test_short_castle() {
         let mut board = Board::default();
-        let king = King::new();
+        let king = King;
         let king_position = Position::from((7, 4));
         let rook_position = Position::from((7, 7));
-        let mut our_rook = Piece::new(PieceType::Rook(Rook::new()), Color::White);
-        let opponent_bishop = Piece::new(PieceType::Bishop(Bishop::new()), Color::Black);
+        let mut our_rook = Piece::new(PieceType::Rook(Rook), Color::White);
+        let opponent_bishop = Piece::new(PieceType::Bishop(Bishop), Color::Black);
 
         board.set(
             &king_position,
-            Some(Piece::new(PieceType::King(King::new()), Color::White)),
+            Some(Piece::new(PieceType::King(King), Color::White)),
         );
 
         board.set(&rook_position, Some(our_rook));
@@ -220,23 +202,6 @@ mod tests {
             king_position,
             Position::from((7, 6))
         )));
-
-        // Place a black bishop to attack the f1 square, disallowing castling
-        /*board.set(&Position::from((2, 0)), Some(opponent_bishop));
-
-        let moves = king.get_moves(Color::White, false, king_position, &board);
-
-        assert!(
-            !moves.contains(&Move::new(
-                MoveType::ShortCastle,
-                king_position,
-                Position::from((7, 6))
-            )),
-            "Castling not allowed when opponent attacks a castling square."
-        );
-
-        // Remove bishop
-        board.set(&Position::from((2, 0)), None);*/
 
         // Place the bishop so it checks the king
         board.set(&Position::from((3, 0)), Some(opponent_bishop));
@@ -254,23 +219,6 @@ mod tests {
 
         // Remove bishop
         board.set(&Position::from((3, 0)), None);
-
-        // Place the bishop so it would check the king after castling
-        /*board.set(&Position::from((3, 2)), Some(opponent_bishop));
-
-        let moves = king.get_moves(Color::White, false, king_position, &board);
-
-        assert!(
-            !moves.contains(&Move::new(
-                MoveType::ShortCastle,
-                king_position,
-                Position::from((7, 6))
-            )),
-            "Castling not allowed when king would be in check after castling."
-        );
-
-        // Remove bishop
-        board.set(&Position::from((3, 0)), None);*/
 
         // Make the king having been moved
         let moves = king.get_moves(Color::White, true, king_position, &board);
@@ -315,7 +263,7 @@ mod tests {
     #[test]
     fn test_king_blocked_by_same_color() {
         let board = Board::new();
-        let king = King::new();
+        let king = King;
         let king_position = Position::from((7, 4));
 
         let moves = king.get_moves(Color::White, false, king_position, &board);
@@ -326,13 +274,13 @@ mod tests {
     #[test]
     fn test_king_can_capture_opponent_piece() {
         let mut board = Board::default();
-        let king = King::new();
+        let king = King;
         let king_position = Position::from((4, 4));
         let opponent_position = Position::from((4, 3));
 
         board.set(
             &king_position,
-            Some(Piece::new(PieceType::King(King::new()), Color::White)),
+            Some(Piece::new(PieceType::King(King), Color::White)),
         );
 
         board.set(

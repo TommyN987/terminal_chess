@@ -2,7 +2,9 @@ use std::ops::{Add, AddAssign};
 
 use derive_new::new;
 
-use crate::{direction::Direction, Color};
+use crate::Color;
+
+use super::Direction;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, new)]
 pub struct Position {

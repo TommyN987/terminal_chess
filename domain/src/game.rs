@@ -1,8 +1,8 @@
 use crate::{
-    board::Board,
-    pieces::{moveable::Move, Moveable, Piece, PieceType},
+    board::{Board, Position},
+    moves::{moveable::Moveable, Move},
+    pieces::{Piece, PieceType},
     player::Player,
-    position::Position,
 };
 
 #[derive(Debug, Clone, PartialEq)]

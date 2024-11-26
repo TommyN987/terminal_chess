@@ -1,6 +1,10 @@
-use crate::{board::Board, position::Position, Color};
+use crate::{
+    board::{Board, Direction, Position},
+    moves::{Move, Moveable},
+    Color,
+};
 
-use super::{Bishop, King, Knight, Move, Moveable, Pawn, Queen, Rook};
+use super::{Bishop, King, Knight, Pawn, Queen, Rook};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Piece {
@@ -55,6 +59,16 @@ impl Moveable for Piece {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum PieceKind {
+    Pawn,
+    Knight,
+    Bishop,
+    Rook,
+    Queen,
+    King,
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum PieceType {
     Pawn(Pawn),
@@ -78,6 +92,47 @@ impl PieceType {
     }
 }
 
+impl From<PieceType> for PieceKind {
+    fn from(value: PieceType) -> Self {
+        match value {
+            PieceType::Pawn(_) => Self::Pawn,
+            PieceType::Knight(_) => Self::Knight,
+            PieceType::Bishop(_) => Self::Bishop,
+            PieceType::Rook(_) => Self::Rook,
+            PieceType::Queen(_) => Self::Queen,
+            PieceType::King(_) => Self::King,
+        }
+    }
+}
+
+impl From<&PieceType> for PieceKind {
+    fn from(value: &PieceType) -> Self {
+        match value {
+            PieceType::Pawn(_) => Self::Pawn,
+            PieceType::Knight(_) => Self::Knight,
+            PieceType::Bishop(_) => Self::Bishop,
+            PieceType::Rook(_) => Self::Rook,
+            PieceType::Queen(_) => Self::Queen,
+            PieceType::King(_) => Self::King,
+        }
+    }
+}
+
+impl From<(&PieceKind, &Color)> for PieceType {
+    fn from((kind, color): (&PieceKind, &Color)) -> Self {
+        match kind {
+            PieceKind::Pawn => match color {
+                Color::White => Self::Pawn(Pawn::new(Direction::North)),
+                Color::Black => Self::Pawn(Pawn::new(Direction::South)),
+            },
+            PieceKind::Knight => Self::Knight(Knight),
+            PieceKind::Bishop => Self::Bishop(Bishop),
+            PieceKind::Rook => Self::Rook(Rook),
+            PieceKind::Queen => Self::Queen(Queen),
+            PieceKind::King => Self::King(King),
+        }
+    }
+}
 impl PartialEq for PieceType {
     fn eq(&self, other: &Self) -> bool {
         matches!(
@@ -130,8 +185,6 @@ impl PieceCounter {
 
 #[cfg(test)]
 mod tests {
-    use crate::direction::Direction;
-
     use super::*;
 
     #[test]
@@ -148,19 +201,19 @@ mod tests {
                 Position::from((2, 3)),
             ),
             (
-                Piece::new(PieceType::Bishop(Bishop::new()), Color::White),
+                Piece::new(PieceType::Bishop(Bishop), Color::White),
                 Position::from((7, 1)),
             ),
             (
-                Piece::new(PieceType::Rook(Rook::new()), Color::White),
+                Piece::new(PieceType::Rook(Rook), Color::White),
                 Position::from((4, 7)),
             ),
             (
-                Piece::new(PieceType::Queen(Queen::new()), Color::White),
+                Piece::new(PieceType::Queen(Queen), Color::White),
                 Position::from((4, 0)),
             ),
             (
-                Piece::new(PieceType::King(King::new()), Color::White),
+                Piece::new(PieceType::King(King), Color::White),
                 Position::from((5, 4)),
             ),
         ];
@@ -171,18 +224,18 @@ mod tests {
                 Position::from((6, 0)),
             ),
             (
-                Piece::new(PieceType::Queen(Queen::new()), Color::White),
+                Piece::new(PieceType::Queen(Queen), Color::White),
                 Position::from((7, 7)),
             ),
             (
-                Piece::new(PieceType::Bishop(Bishop::new()), Color::White),
+                Piece::new(PieceType::Bishop(Bishop), Color::White),
                 Position::from((7, 4)),
             ),
         ];
 
         board.set(
             &opponent_king_position,
-            Some(Piece::new(PieceType::King(King::new()), Color::Black)),
+            Some(Piece::new(PieceType::King(King), Color::Black)),
         );
 
         white_pieces.iter().for_each(|(piece, pos)| {

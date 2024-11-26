@@ -1,11 +1,12 @@
 use derive_new::new;
 
-use crate::{board::Board, direction::Direction, position::Position, Color};
-
-use super::{
-    moveable::{Move, MoveType, Moveable},
-    King, PieceType,
+use crate::{
+    board::{Board, Direction, Position},
+    moves::{Move, MoveType, Moveable},
+    Color,
 };
+
+use super::{King, PieceKind, PieceType};
 
 #[derive(Debug, Clone, Copy, PartialEq, new)]
 pub struct Pawn {
@@ -32,7 +33,7 @@ impl Moveable for Pawn {
             .iter()
             .any(|m| match board.get(&m.to) {
                 None => false,
-                Some(piece) => piece.piece_type == PieceType::King(King::default()),
+                Some(piece) => piece.piece_type == PieceType::King(King),
             })
     }
 }
@@ -98,7 +99,7 @@ impl Pawn {
 
     fn derive_move_type(&self, to: &Position) -> MoveType {
         if to.row == 0 || to.row == 7 {
-            return MoveType::Promotion;
+            return MoveType::Promotion(PieceKind::Queen);
         }
         MoveType::Normal
     }
@@ -252,7 +253,7 @@ mod tests {
         let pos = Position::from((4, 4));
         board.set(
             &Position::from((3, 3)),
-            Some(Piece::new(PieceType::King(King::new()), Color::Black)),
+            Some(Piece::new(PieceType::King(King), Color::Black)),
         );
         let can_capture_king =
             white_pawn.can_capture_opponent_king(Color::White, true, pos, &board);
