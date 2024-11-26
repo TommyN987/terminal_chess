@@ -42,7 +42,7 @@ impl BoardEnterCommand {
     fn handle_piece_or_move(&self, app: &mut App) -> AppResult<()> {
         let cursor_position = app.game.view_state.cursor_position;
 
-        if let Some(piece) = app.game.game_state.board.get(&cursor_position) {
+        if let Some(piece) = app.game.game_state.board[&cursor_position] {
             if app.game.game_state.current_player.color == piece.piece_color {
                 app.game.select_piece();
                 return Ok(());
