@@ -31,7 +31,7 @@ impl Moveable for Pawn {
     ) -> bool {
         self.diagonal_moves(color, from, board)
             .iter()
-            .any(|m| match board.get(&m.to) {
+            .any(|m| match board[&m.to] {
                 None => false,
                 Some(piece) => piece.piece_type == PieceType::King(King),
             })
@@ -40,7 +40,7 @@ impl Moveable for Pawn {
 
 impl Pawn {
     fn can_move_to(&self, pos: &Position, board: &Board) -> bool {
-        board.is_inside(pos) && board.get(pos).is_none()
+        board.is_inside(pos) && board[pos].is_none()
     }
 
     fn can_capture_at(&self, color: Color, pos: &Position, board: &Board) -> bool {
@@ -48,7 +48,7 @@ impl Pawn {
             return false;
         }
 
-        match board.get(pos) {
+        match board[pos] {
             None => false,
             Some(piece) => piece.piece_color != color,
         }

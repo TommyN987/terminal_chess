@@ -39,7 +39,7 @@ impl Knight {
             .into_iter()
             .filter(|pos| {
                 board.is_inside(pos)
-                    && match board.get(pos) {
+                    && match board[pos] {
                         None => true,
                         Some(piece) => piece.piece_color != color,
                     }

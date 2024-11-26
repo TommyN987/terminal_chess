@@ -115,7 +115,7 @@ impl Move {
     }
 
     fn is_move_legal(&self, board: &Board) -> bool {
-        board.get(&self.from).map_or(false, |piece| {
+        board[&self.from].map_or(false, |piece| {
             let player = Player::new(piece.piece_color);
             let mut cloned_board = board.clone();
             self.execute(&mut cloned_board);
@@ -124,7 +124,7 @@ impl Move {
     }
 
     fn is_castling_legal(&self, board: &Board) -> bool {
-        let piece = match board.get(&self.from) {
+        let piece = match board[&self.from] {
             Some(piece) => piece,
             None => return false,
         };
@@ -172,8 +172,8 @@ mod tests {
         let mut moved_pawn = Piece::new(PieceType::Pawn(Pawn::new(Direction::North)), Color::White);
         moved_pawn.has_moved = true;
 
-        assert!(board.get(&from).is_none());
-        assert_eq!(board.get(&to), Some(moved_pawn));
+        assert!(board[&from].is_none());
+        assert_eq!(board[&to], Some(moved_pawn));
     }
 
     #[test]

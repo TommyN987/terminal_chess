@@ -56,7 +56,7 @@ impl Moveable for King {
     ) -> bool {
         self.move_positions(color, from, board)
             .iter()
-            .any(|pos| match board.get(pos) {
+            .any(|pos| match board[pos] {
                 None => false,
                 Some(piece) => piece.piece_type == PieceType::King(King),
             })
@@ -73,7 +73,7 @@ impl King {
                     return None;
                 }
 
-                match board.get(&to) {
+                match board[&to] {
                     None => Some(to),
                     Some(piece) => match piece.piece_color == color {
                         true => None,
@@ -125,14 +125,14 @@ impl King {
     }
 
     fn is_rook_unmoved(&self, position: &Position, board: &Board) -> bool {
-        match board.get(position) {
+        match board[position] {
             None => false,
             Some(piece) => !piece.has_moved,
         }
     }
 
     fn are_castling_squares_empty(&self, positions: Vec<Position>, board: &Board) -> bool {
-        positions.iter().all(|pos| board.get(pos).is_none())
+        positions.iter().all(|pos| board[pos].is_none())
     }
 }
 

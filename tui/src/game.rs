@@ -25,7 +25,7 @@ impl Display for Game {
         writeln!(f, "Current player: {:?}", self.game_state.current_player)?;
         writeln!(f, "Cursor position: {:?}", self.view_state.cursor_position)?;
         if let Some(pos) = self.view_state.selected_position {
-            writeln!(f, "Selected piece: {:?}", self.game_state.board.get(&pos))?;
+            writeln!(f, "Selected piece: {:?}", self.game_state.board[&pos])?;
         }
         writeln!(
             f,
@@ -70,7 +70,7 @@ impl Game {
     }
 
     pub fn select_piece(&mut self) {
-        if let Some(_) = self.game_state.board.get(&self.view_state.cursor_position) {
+        if let Some(_) = self.game_state.board[&self.view_state.cursor_position] {
             let position = self.view_state.cursor_position;
             self.view_state.selected_position = Some(position.clone());
             if let Some((_, moves)) = self

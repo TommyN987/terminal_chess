@@ -27,10 +27,6 @@ impl Board {
         Self::init_starting_position()
     }
 
-    pub fn get(&self, pos: &Position) -> Option<Piece> {
-        self.fields[pos.row as usize][pos.column as usize]
-    }
-
     pub fn set(&mut self, pos: &Position, piece: Option<Piece>) {
         self.fields[pos.row as usize][pos.column as usize] = piece;
     }

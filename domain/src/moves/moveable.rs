@@ -18,10 +18,10 @@ pub(crate) trait Moveable {
         board: &Board,
     ) -> Vec<Position> {
         let mut result = vec![];
-        if let Some(current_piece) = board.get(&from) {
+        if let Some(current_piece) = board[&from] {
             let mut pos = from + *dir;
             while board.is_inside(&pos) {
-                match board.get(&pos) {
+                match board[&pos] {
                     None => result.push(pos),
                     Some(piece) if current_piece.piece_color != piece.piece_color => {
                         result.push(pos);

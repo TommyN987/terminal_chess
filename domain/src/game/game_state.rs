@@ -33,7 +33,7 @@ impl GameState {
     }
 
     pub fn legal_moves_for_piece(&self, from: Position) -> Option<(Piece, Vec<Move>)> {
-        match self.board.get(&from) {
+        match self.board[&from] {
             None => None,
             Some(piece) => {
                 if piece.piece_color == self.current_player.color {
@@ -73,7 +73,7 @@ impl GameState {
             .piece_positions_for_player(player)
             .iter()
             .filter_map(|pos| {
-                self.board.get(pos).map(|piece| {
+                self.board[pos].map(|piece| {
                     piece
                         .get_moves(piece.piece_color, piece.has_moved, *pos, &self.board)
                         .into_iter()
