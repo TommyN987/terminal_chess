@@ -1,4 +1,4 @@
-use domain::{game::GameResult, player::Player};
+use domain::{game::GameResult, game::Player};
 
 pub struct GameOver {
     pub winner: Option<Player>,

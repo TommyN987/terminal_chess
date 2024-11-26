@@ -1,4 +1,4 @@
-use domain::pieces::{Move, MoveType};
+use domain::moves::{Move, MoveType};
 
 use crate::{
     app::{App, AppResult, Direction, EventContext},
@@ -50,7 +50,7 @@ impl BoardEnterCommand {
         }
 
         if let Some(m) = self.find_move_to_cursor(app) {
-            if m.move_type == MoveType::Promotion {
+            if matches!(m.move_type, MoveType::Promotion(_)) {
                 self.open_promotion_menu(app, m)?;
                 app.event_context = EventContext::PromotionMenu;
             } else {
@@ -72,7 +72,7 @@ impl BoardEnterCommand {
             .currently_legal_moves
             .iter()
             .find(|m| m.to == cursor_position)
-            .copied()
+            .cloned()
     }
 
     fn open_promotion_menu(&self, app: &mut App, promotion_move: Move) -> AppResult<()> {

@@ -1,7 +1,5 @@
 use derive_new::new;
 
-use crate::Color;
-
 #[derive(Debug, Clone, Copy, PartialEq, new)]
 pub struct Player {
     pub color: Color,
@@ -24,6 +22,21 @@ impl Player {
             Color::Black => Self {
                 color: Color::White,
             },
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Color {
+    White,
+    Black,
+}
+
+impl Color {
+    pub fn opponent(&self) -> Self {
+        match self {
+            Color::White => Color::Black,
+            Color::Black => Color::White,
         }
     }
 }

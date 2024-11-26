@@ -1,4 +1,4 @@
-use domain::position::Position;
+use domain::board::Position;
 use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Direction, Layout, Rect},

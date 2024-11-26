@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use domain::{game::GameState, pieces::Move, position::Position};
+use domain::{board::Position, game::GameState, moves::Move};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     Frame,

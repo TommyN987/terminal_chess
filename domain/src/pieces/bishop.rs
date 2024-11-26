@@ -1,32 +1,20 @@
-use crate::{board::Board, direction::Direction, position::Position, Color};
-
-use super::moveable::{Move, MoveType, Moveable};
+use crate::{
+    board::{Board, Direction, Position},
+    game::Color,
+    moves::{Move, MoveType, Moveable},
+};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Bishop {
-    directions: [Direction; 4],
-}
-
-impl Default for Bishop {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Bishop {
-    pub fn new() -> Self {
-        Self {
-            directions: [
-                Direction::NorthEast,
-                Direction::NorthWest,
-                Direction::SouthEast,
-                Direction::SouthWest,
-            ],
-        }
-    }
-}
+pub struct Bishop;
 
 impl Moveable for Bishop {
+    const DIRECTIONS: &'static [Direction] = &[
+        Direction::NorthEast,
+        Direction::NorthWest,
+        Direction::SouthEast,
+        Direction::SouthWest,
+    ];
+
     fn get_moves(
         &self,
         _color: Color,
@@ -34,7 +22,7 @@ impl Moveable for Bishop {
         from: Position,
         board: &Board,
     ) -> Vec<Move> {
-        self.reachable_positions_in_many_directions(from, board, &self.directions)
+        self.reachable_positions_in_many_directions(from, board)
             .into_iter()
             .map(|pos| Move::new(MoveType::Normal, from, pos))
             .collect()
@@ -55,11 +43,11 @@ mod tests {
         // Place a White Bishop on the board
         board.set(
             &bishop_position,
-            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::White)),
+            Some(Piece::new(PieceType::Bishop(Bishop), Color::White)),
         );
 
         // Generate moves
-        let bishop = Bishop::new();
+        let bishop = Bishop;
         let moves = bishop.get_moves(Color::White, false, bishop_position, &board);
 
         // Bishop should have moves in all four diagonal directions from (4, 4)
@@ -99,7 +87,7 @@ mod tests {
         // Place a White Bishop and a White blocker piece
         board.set(
             &bishop_position,
-            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::White)),
+            Some(Piece::new(PieceType::Bishop(Bishop), Color::White)),
         );
         board.set(
             &blocker_position,
@@ -110,7 +98,7 @@ mod tests {
         );
 
         // Generate moves
-        let bishop = Bishop::new();
+        let bishop = Bishop;
         let moves = bishop.get_moves(Color::White, false, bishop_position, &board);
 
         // Bishop should not be able to move past the blocker at (5, 5)
@@ -134,7 +122,7 @@ mod tests {
         // Place a White Bishop and a Black Pawn as an opponent
         board.set(
             &bishop_position,
-            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::White)),
+            Some(Piece::new(PieceType::Bishop(Bishop), Color::White)),
         );
         board.set(
             &opponent_position,
@@ -145,7 +133,7 @@ mod tests {
         );
 
         // Generate moves
-        let bishop = Bishop::new();
+        let bishop = Bishop;
         let moves = bishop.get_moves(Color::White, false, bishop_position, &board);
 
         // Bishop should be able to capture the opponent at (5, 5) but not move past it
@@ -168,11 +156,11 @@ mod tests {
         // Place a White Bishop
         board.set(
             &bishop_position,
-            Some(Piece::new(PieceType::Bishop(Bishop::new()), Color::White)),
+            Some(Piece::new(PieceType::Bishop(Bishop), Color::White)),
         );
 
         // Generate moves
-        let bishop = Bishop::new();
+        let bishop = Bishop;
         let moves = bishop.get_moves(Color::White, false, bishop_position, &board);
 
         // Bishop should only be able to move inwards along the board from the corner

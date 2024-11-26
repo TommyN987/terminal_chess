@@ -1,6 +1,8 @@
-use crate::{board::Board, direction::Direction, position::Position, Color};
-
-use super::moveable::{Move, MoveType, Moveable};
+use crate::{
+    board::{Board, Direction, Position},
+    game::Color,
+    moves::{Move, MoveType, Moveable},
+};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Knight;

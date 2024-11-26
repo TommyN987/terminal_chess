@@ -1,32 +1,20 @@
-use crate::{board::Board, direction::Direction, position::Position, Color};
-
-use super::moveable::{Move, MoveType, Moveable};
+use crate::{
+    board::{Board, Direction, Position},
+    game::Color,
+    moves::{Move, MoveType, Moveable},
+};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Rook {
-    directions: [Direction; 4],
-}
-
-impl Default for Rook {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Rook {
-    pub fn new() -> Self {
-        Self {
-            directions: [
-                Direction::North,
-                Direction::South,
-                Direction::East,
-                Direction::West,
-            ],
-        }
-    }
-}
+pub struct Rook;
 
 impl Moveable for Rook {
+    const DIRECTIONS: &'static [Direction] = &[
+        Direction::North,
+        Direction::South,
+        Direction::East,
+        Direction::West,
+    ];
+
     fn get_moves(
         &self,
         _color: Color,
@@ -34,7 +22,7 @@ impl Moveable for Rook {
         from: Position,
         board: &Board,
     ) -> Vec<Move> {
-        self.reachable_positions_in_many_directions(from, board, &self.directions)
+        self.reachable_positions_in_many_directions(from, board)
             .into_iter()
             .map(|pos| Move::new(MoveType::Normal, from, pos))
             .collect()
@@ -53,11 +41,11 @@ mod tests {
 
         let mut board = Board::default();
         let rook_position = Position::from((4, 4));
-        let rook = Rook::new();
+        let rook = Rook;
 
         board.set(
             &rook_position,
-            Some(Piece::new(PieceType::Rook(Rook::new()), Color::White)),
+            Some(Piece::new(PieceType::Rook(Rook), Color::White)),
         );
 
         // Act
@@ -98,7 +86,7 @@ mod tests {
     fn test_rook_blocked_by_same_color() {
         // Arrange
         let board = Board::new();
-        let rook = Rook::new();
+        let rook = Rook;
         let rook_position = Position::from((7, 7));
 
         // Act
@@ -112,18 +100,18 @@ mod tests {
     fn test_rook_can_capture_opponent_piece() {
         // Arrange
         let mut board = Board::default();
-        let rook = Rook::new();
+        let rook = Rook;
         let rook_position = Position::from((4, 4));
         let opponent_position = Position::from((4, 5));
 
         board.set(
             &rook_position,
-            Some(Piece::new(PieceType::Rook(Rook::new()), Color::White)),
+            Some(Piece::new(PieceType::Rook(Rook), Color::White)),
         );
 
         board.set(
             &opponent_position,
-            Some(Piece::new(PieceType::Rook(Rook::new()), Color::Black)),
+            Some(Piece::new(PieceType::Rook(Rook), Color::Black)),
         );
 
         // Act

@@ -1,15 +1,16 @@
 use crate::{
-    board::Board,
-    pieces::{moveable::Move, Moveable, Piece, PieceType},
-    player::Player,
-    position::Position,
+    board::{Board, Position},
+    moves::{moveable::Moveable, Move, MoveRecord},
+    pieces::{Piece, PieceKind},
 };
+
+use super::{InsufficientMaterial, Player};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct GameState {
     pub board: Board,
     pub current_player: Player,
-    pub promotion_move: Option<(Move, PieceType)>,
+    pub move_history: Vec<MoveRecord>,
     pub non_capture_or_pawn_move_counter: u8,
     pub result: Option<GameResult>,
 }
@@ -25,7 +26,7 @@ impl GameState {
         Self {
             board: Board::new(),
             current_player: Player::default(),
-            promotion_move: None,
+            move_history: vec![],
             non_capture_or_pawn_move_counter: 0,
             result: None,
         }
@@ -52,26 +53,13 @@ impl GameState {
     }
 
     pub fn make_move(&mut self, m: Move) {
-        match self.promotion_move {
-            None => {
-                let is_capture_or_pawn_move = m.execute(&mut self.board, None);
-                if is_capture_or_pawn_move {
-                    self.non_capture_or_pawn_move_counter = 0;
-                } else {
-                    self.non_capture_or_pawn_move_counter += 1;
-                }
-            }
-            Some((m, piece_type)) => {
-                let promotion_piece = Piece::new(piece_type, self.current_player.color);
-                let is_capture_or_pawn_move = m.execute(&mut self.board, Some(promotion_piece));
-                if is_capture_or_pawn_move {
-                    self.non_capture_or_pawn_move_counter = 0;
-                } else {
-                    self.non_capture_or_pawn_move_counter += 1;
-                }
-                self.promotion_move = None;
-            }
-        };
+        let move_record = m.execute(&mut self.board);
+        if move_record.piece_captured.is_some() || move_record.piece_moved == PieceKind::Pawn {
+            self.non_capture_or_pawn_move_counter = 0;
+        } else {
+            self.non_capture_or_pawn_move_counter += 1;
+        }
+        self.move_history.push(move_record);
         self.current_player = self.current_player.opponent();
         self.check_for_game_over();
     }
@@ -109,13 +97,18 @@ impl GameState {
             }
         }
 
-        if self.board.insufficient_material() {
+        if self.insufficient_material() {
             self.result = Some(GameResult::draw(EndReason::InsufficientMaterial));
         }
 
         if self.fifty_move_rule() {
             self.result = Some(GameResult::draw(EndReason::FiftyMoveRule));
         }
+    }
+
+    fn insufficient_material(&self) -> bool {
+        let piece_counter = self.board.count_pieces();
+        *InsufficientMaterial::derive(&piece_counter)
     }
 
     fn fifty_move_rule(&self) -> bool {

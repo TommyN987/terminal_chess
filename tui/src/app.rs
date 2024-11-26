@@ -1,4 +1,4 @@
-use domain::{direction::Direction as DomainDirection, game::GameState};
+use domain::{board::Direction as DomainDirection, game::GameState};
 use ratatui::{layout::Rect, Frame};
 
 use crate::{game::Game, menu::Menu};
