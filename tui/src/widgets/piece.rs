@@ -6,8 +6,8 @@ use ratatui::{
 };
 
 use domain::{
+    game::Color as DomainColor,
     pieces::{Piece as DomainPiece, PieceType},
-    Color as DomainColor,
 };
 
 use crate::constants::{BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK};

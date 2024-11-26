@@ -1,6 +1,7 @@
 use domain::{
-    pieces::{Bishop, Knight, Move, Piece as DomainPiece, PieceType, Queen, Rook},
-    Color as DomainColor,
+    game::Color as DomainColor,
+    moves::Move,
+    pieces::{Bishop, Knight, Piece as DomainPiece, PieceType, Queen, Rook},
 };
 use ratatui::{
     buffer::Buffer,
@@ -22,15 +23,9 @@ impl PromotionMenu {
     pub fn new(piece_color: DomainColor, m: Move) -> Self {
         Self {
             pieces: [
-                Piece::from(&DomainPiece::new(
-                    PieceType::Queen(Queen::new()),
-                    piece_color,
-                )),
-                Piece::from(&DomainPiece::new(PieceType::Rook(Rook::new()), piece_color)),
-                Piece::from(&DomainPiece::new(
-                    PieceType::Bishop(Bishop::new()),
-                    piece_color,
-                )),
+                Piece::from(&DomainPiece::new(PieceType::Queen(Queen), piece_color)),
+                Piece::from(&DomainPiece::new(PieceType::Rook(Rook), piece_color)),
+                Piece::from(&DomainPiece::new(PieceType::Bishop(Bishop), piece_color)),
                 Piece::from(&DomainPiece::new(PieceType::Knight(Knight), piece_color)),
             ],
             selected: 0,

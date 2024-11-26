@@ -137,6 +137,18 @@ impl From<&PromotionPiece> for PieceType {
         }
     }
 }
+
+impl From<PieceType> for PromotionPiece {
+    fn from(value: PieceType) -> Self {
+        match value {
+            PieceType::Knight(_) => PromotionPiece::Knight,
+            PieceType::Bishop(_) => PromotionPiece::Bishop,
+            PieceType::Rook(_) => PromotionPiece::Rook,
+            _ => PromotionPiece::Queen,
+        }
+    }
+}
+
 impl PartialEq for PieceType {
     fn eq(&self, other: &Self) -> bool {
         matches!(

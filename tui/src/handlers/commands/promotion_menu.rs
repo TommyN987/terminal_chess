@@ -1,4 +1,5 @@
 use derive_new::new;
+use domain::moves::MoveType;
 
 use crate::app::{App, AppResult, EventContext};
 
@@ -32,9 +33,10 @@ impl Command for PromotionMenuEnterCommand {
                 .clone()
                 .inner()
                 .piece_type;
+            let mut promotion_move = promotion_menu.m.clone();
+            promotion_move.move_type = MoveType::Promotion(selected_piece_type.into());
 
-            app.game.game_state.promotion_move = Some((promotion_menu.m, selected_piece_type));
-            app.game.game_state.make_move(promotion_menu.m);
+            app.game.game_state.make_move(promotion_move);
             app.game.view_state.promotion_menu = None;
             app.game.view_state.currently_legal_moves.clear();
             match app.game.game_state.is_game_over() {
