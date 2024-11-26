@@ -1,7 +1,7 @@
 use crate::{
     board::{Board, Direction, Position},
+    game::Color,
     moves::{Move, MoveType, Moveable},
-    Color,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq)]

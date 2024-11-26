@@ -1,8 +1,7 @@
 use crate::{
     board::{Board, Direction, Position},
+    game::{Color, Player},
     moves::{Move, MoveType, Moveable},
-    player::Player,
-    Color,
 };
 
 use super::PieceType;

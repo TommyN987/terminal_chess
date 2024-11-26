@@ -1,6 +1,6 @@
 use crate::{
+    game::Color,
     pieces::{Bishop, King, Knight, Pawn, Piece, PieceKind, PieceType, Queen, Rook},
-    Color,
 };
 
 use super::{Board, Direction, Position};

@@ -42,8 +42,8 @@ impl InsufficientMaterial {
 
     fn king_bishop_vs_king(mut self, piece_counter: &PieceCounter) -> Self {
         if piece_counter.get_total() == 3
-            && (piece_counter.get_white(&PieceType::Bishop(Bishop::new())) == 1
-                || piece_counter.get_black(&PieceType::Bishop(Bishop::new())) == 1)
+            && (piece_counter.get_white(&PieceType::Bishop(Bishop)) == 1
+                || piece_counter.get_black(&PieceType::Bishop(Bishop)) == 1)
         {
             self.0 = true;
         }

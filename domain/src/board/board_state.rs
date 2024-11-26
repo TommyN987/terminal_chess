@@ -3,11 +3,9 @@ use std::fmt::Display;
 use derive_new::new;
 
 use crate::{
-    insufficient_material::InsufficientMaterial,
+    game::{Color, Player},
     moves::{Move, Moveable},
     pieces::{Piece, PieceCounter, PieceKind, PieceType},
-    player::Player,
-    Color,
 };
 
 use super::{BoardBuilder, Position};
@@ -63,9 +61,15 @@ impl Board {
             .collect()
     }
 
-    pub fn insufficient_material(&self) -> bool {
-        let piece_counter = self.count_pieces();
-        *InsufficientMaterial::derive(&piece_counter)
+    pub fn count_pieces(&self) -> PieceCounter {
+        self.piece_positions()
+            .iter()
+            .fold(PieceCounter::new(), |mut acc, pos| {
+                if let Some(piece) = self[pos] {
+                    acc.increment(&piece.piece_color, &piece.piece_type);
+                }
+                acc
+            })
     }
 
     pub fn get_en_passant_square(&self, player: &Color) -> Option<Position> {
@@ -106,17 +110,6 @@ impl Board {
                     .filter_map(move |(j, cell)| cell.as_ref().map(|_| Position::from((i, j))))
             })
             .collect()
-    }
-
-    fn count_pieces(&self) -> PieceCounter {
-        self.piece_positions()
-            .iter()
-            .fold(PieceCounter::new(), |mut acc, pos| {
-                if let Some(piece) = self[pos] {
-                    acc.increment(&piece.piece_color, &piece.piece_type);
-                }
-                acc
-            })
     }
 
     fn init_starting_position() -> Self {

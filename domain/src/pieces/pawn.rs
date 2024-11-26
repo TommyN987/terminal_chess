@@ -2,11 +2,11 @@ use derive_new::new;
 
 use crate::{
     board::{Board, Direction, Position},
+    game::Color,
     moves::{Move, MoveType, Moveable},
-    Color,
 };
 
-use super::{King, PieceKind, PieceType};
+use super::{King, PieceType, PromotionPiece};
 
 #[derive(Debug, Clone, Copy, PartialEq, new)]
 pub struct Pawn {
@@ -99,7 +99,7 @@ impl Pawn {
 
     fn derive_move_type(&self, to: &Position) -> MoveType {
         if to.row == 0 || to.row == 7 {
-            return MoveType::Promotion(PieceKind::Queen);
+            return MoveType::Promotion(PromotionPiece::default());
         }
         MoveType::Normal
     }

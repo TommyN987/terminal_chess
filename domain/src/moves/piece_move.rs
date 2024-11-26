@@ -2,9 +2,8 @@ use derive_new::new;
 
 use crate::{
     board::{Board, Position},
-    pieces::{Piece, PieceKind, PieceType},
-    player::Player,
-    Color,
+    game::{Color, Player},
+    pieces::{Piece, PieceKind, PromotionPiece},
 };
 
 #[derive(Debug, Clone, PartialEq, new)]
@@ -21,10 +20,10 @@ pub enum MoveType {
     LongCastle,
     DoublePawn,
     EnPassant,
-    Promotion(PieceKind),
+    Promotion(PromotionPiece),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct MoveRecord {
     pub mv: Move,
     pub piece_moved: PieceKind,
@@ -106,9 +105,9 @@ impl Move {
         self.handle_normal_move(board, piece);
     }
 
-    fn handle_promotion(&self, board: &mut Board, kind: &PieceKind, color: Color) {
+    fn handle_promotion(&self, board: &mut Board, promotion_piece: &PromotionPiece, color: Color) {
         let promoted_piece = Piece {
-            piece_type: PieceType::from((kind, &color)),
+            piece_type: promotion_piece.into(),
             piece_color: color,
             has_moved: true,
         };
@@ -155,7 +154,7 @@ impl Move {
 mod tests {
     use crate::{
         board::Direction,
-        pieces::{Bishop, Pawn, Piece},
+        pieces::{Bishop, Pawn, Piece, PieceType},
     };
 
     use super::*;

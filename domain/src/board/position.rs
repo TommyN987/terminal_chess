@@ -2,7 +2,7 @@ use std::ops::{Add, AddAssign};
 
 use derive_new::new;
 
-use crate::Color;
+use crate::game::Color;
 
 use super::Direction;
 

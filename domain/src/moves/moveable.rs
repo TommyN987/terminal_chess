@@ -1,7 +1,7 @@
 use crate::{
     board::{Board, Direction, Position},
+    game::Color,
     pieces::PieceKind,
-    Color,
 };
 
 use super::Move;
@@ -55,6 +55,10 @@ pub(crate) trait Moveable {
     ) -> bool {
         self.get_moves(color, has_moved, from, board)
             .iter()
-            .any(|m| board[&m.to].map_or(false, |piece| piece.piece_type.into() == PieceKind::King))
+            .any(|m| {
+                board[&m.to].map_or(false, |piece| {
+                    PieceKind::from(piece.piece_type) == PieceKind::King
+                })
+            })
     }
 }

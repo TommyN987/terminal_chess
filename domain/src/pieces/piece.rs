@@ -1,7 +1,7 @@
 use crate::{
-    board::{Board, Direction, Position},
+    board::{Board, Position},
+    game::Color,
     moves::{Move, Moveable},
-    Color,
 };
 
 use super::{Bishop, King, Knight, Pawn, Queen, Rook};
@@ -69,6 +69,15 @@ pub enum PieceKind {
     King,
 }
 
+#[derive(Debug, Clone, PartialEq, Default)]
+pub enum PromotionPiece {
+    Knight,
+    Bishop,
+    Rook,
+    #[default]
+    Queen,
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum PieceType {
     Pawn(Pawn),
@@ -118,18 +127,13 @@ impl From<&PieceType> for PieceKind {
     }
 }
 
-impl From<(&PieceKind, &Color)> for PieceType {
-    fn from((kind, color): (&PieceKind, &Color)) -> Self {
-        match kind {
-            PieceKind::Pawn => match color {
-                Color::White => Self::Pawn(Pawn::new(Direction::North)),
-                Color::Black => Self::Pawn(Pawn::new(Direction::South)),
-            },
-            PieceKind::Knight => Self::Knight(Knight),
-            PieceKind::Bishop => Self::Bishop(Bishop),
-            PieceKind::Rook => Self::Rook(Rook),
-            PieceKind::Queen => Self::Queen(Queen),
-            PieceKind::King => Self::King(King),
+impl From<&PromotionPiece> for PieceType {
+    fn from(promotion_piece: &PromotionPiece) -> Self {
+        match promotion_piece {
+            PromotionPiece::Knight => Self::Knight(Knight),
+            PromotionPiece::Bishop => Self::Bishop(Bishop),
+            PromotionPiece::Rook => Self::Rook(Rook),
+            PromotionPiece::Queen => Self::Queen(Queen),
         }
     }
 }
@@ -185,6 +189,8 @@ impl PieceCounter {
 
 #[cfg(test)]
 mod tests {
+    use crate::board::Direction;
+
     use super::*;
 
     #[test]
