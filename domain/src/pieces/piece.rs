@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::{
     board::{Board, Position},
     game::Color,
@@ -67,6 +69,19 @@ pub enum PieceKind {
     Rook,
     Queen,
     King,
+}
+
+impl Display for PieceKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Pawn => write!(f, "{}", 'p'),
+            Self::Knight => write!(f, "{}", 'n'),
+            Self::Bishop => write!(f, "{}", 'b'),
+            Self::Rook => write!(f, "{}", 'r'),
+            Self::Queen => write!(f, "{}", 'q'),
+            Self::King => write!(f, "{}", 'k'),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Default)]

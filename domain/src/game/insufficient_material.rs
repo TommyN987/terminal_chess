@@ -1,24 +1,18 @@
-use std::ops::Deref;
-
 use crate::pieces::{Bishop, Knight, PieceCounter, PieceType};
 
 #[derive(Debug, Default)]
-pub struct InsufficientMaterial(bool);
-
-impl Deref for InsufficientMaterial {
-    type Target = bool;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
+pub(super) struct InsufficientMaterial(bool);
 
 impl InsufficientMaterial {
-    pub fn derive(piece_counter: &PieceCounter) -> Self {
+    pub(super) fn derive(piece_counter: &PieceCounter) -> Self {
         Self::default()
             .king_vs_king(piece_counter)
             .king_knight_vs_king(piece_counter)
             .king_bishop_vs_king(piece_counter)
+    }
+
+    pub(super) fn inner(self) -> bool {
+        self.0
     }
 
     fn king_vs_king(mut self, piece_counter: &PieceCounter) -> Self {

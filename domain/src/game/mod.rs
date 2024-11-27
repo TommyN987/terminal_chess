@@ -1,7 +1,9 @@
+pub(super) mod fen;
 pub mod game_state;
-pub(crate) mod insufficient_material;
+pub(super) mod insufficient_material;
 pub mod player;
 
+use fen::*;
 pub use game_state::*;
-pub use insufficient_material::*;
+use insufficient_material::*;
 pub use player::*;

@@ -1,18 +1,22 @@
+use std::collections::HashMap;
+
 use crate::{
     board::{Board, Position},
-    moves::{moveable::Moveable, Move, MoveRecord},
+    moves::{Move, MoveRecord, Moveable},
     pieces::{Piece, PieceKind},
 };
 
-use super::{InsufficientMaterial, Player};
+use super::{FenString, InsufficientMaterial, Player};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct GameState {
     pub board: Board,
     pub current_player: Player,
     pub move_history: Vec<MoveRecord>,
+    pub state_history: HashMap<FenString, u16>,
     pub non_capture_or_pawn_move_counter: u8,
     pub result: Option<GameResult>,
+    fen_string: FenString,
 }
 
 impl Default for GameState {
@@ -23,12 +27,18 @@ impl Default for GameState {
 
 impl GameState {
     pub fn new() -> Self {
+        let board = Board::new();
+        let current_player = Player::default();
+        let fen_string = FenString::derive(&board, &current_player);
+        let state_history = HashMap::from_iter([(fen_string.clone(), 1)]);
         Self {
-            board: Board::new(),
-            current_player: Player::default(),
+            board,
+            current_player,
             move_history: vec![],
+            state_history,
             non_capture_or_pawn_move_counter: 0,
             result: None,
+            fen_string,
         }
     }
 
@@ -56,10 +66,12 @@ impl GameState {
         let move_record = m.execute(&mut self.board);
         if move_record.piece_captured.is_some() || move_record.piece_moved == PieceKind::Pawn {
             self.non_capture_or_pawn_move_counter = 0;
+            self.state_history.clear();
         } else {
             self.non_capture_or_pawn_move_counter += 1;
         }
         self.move_history.push(move_record);
+        self.update_fen_string();
         self.current_player = self.current_player.opponent();
         self.check_for_game_over();
     }
@@ -85,6 +97,14 @@ impl GameState {
             .collect()
     }
 
+    fn update_fen_string(&mut self) {
+        self.fen_string = FenString::derive(&self.board, &self.current_player);
+        self.state_history
+            .entry(self.fen_string.clone())
+            .and_modify(|count| *count += 1)
+            .or_insert(1);
+    }
+
     fn check_for_game_over(&mut self) {
         if self
             .all_legal_moves_for_player(&self.current_player)
@@ -104,15 +124,25 @@ impl GameState {
         if self.fifty_move_rule() {
             self.result = Some(GameResult::draw(EndReason::FiftyMoveRule));
         }
+
+        if self.threefold_repetition() {
+            self.result = Some(GameResult::draw(EndReason::ThreefoldRepetition))
+        }
     }
 
     fn insufficient_material(&self) -> bool {
         let piece_counter = self.board.count_pieces();
-        *InsufficientMaterial::derive(&piece_counter)
+        InsufficientMaterial::derive(&piece_counter).inner()
     }
 
     fn fifty_move_rule(&self) -> bool {
         self.non_capture_or_pawn_move_counter >= 100
+    }
+
+    fn threefold_repetition(&self) -> bool {
+        self.state_history
+            .get(&self.fen_string)
+            .map_or(false, |count| *count == 3)
     }
 }
 
