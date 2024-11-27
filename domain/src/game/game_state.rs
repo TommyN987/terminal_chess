@@ -6,7 +6,7 @@ use crate::{
     pieces::{Piece, PieceKind},
 };
 
-use super::{FenString, InsufficientMaterial, Player};
+use super::{FenString, InsufficientMaterial, PieceCounter, Player};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct GameState {
@@ -97,6 +97,18 @@ impl GameState {
             .collect()
     }
 
+    fn count_pieces(&self) -> PieceCounter {
+        self.board
+            .piece_positions()
+            .iter()
+            .fold(PieceCounter::new(), |mut acc, pos| {
+                if let Some(piece) = self.board[pos] {
+                    acc.increment(&piece.piece_color, &piece.piece_type);
+                }
+                acc
+            })
+    }
+
     fn update_fen_string(&mut self) {
         self.fen_string = FenString::derive(&self.board, &self.current_player);
         self.state_history
@@ -131,7 +143,7 @@ impl GameState {
     }
 
     fn insufficient_material(&self) -> bool {
-        let piece_counter = self.board.count_pieces();
+        let piece_counter = self.count_pieces();
         InsufficientMaterial::derive(&piece_counter).inner()
     }
 

@@ -1,4 +1,6 @@
-use crate::pieces::{Bishop, Knight, PieceCounter, PieceType};
+use crate::pieces::{Bishop, Knight, PieceType};
+
+use super::PieceCounter;
 
 #[derive(Debug, Default)]
 pub(super) struct InsufficientMaterial(bool);

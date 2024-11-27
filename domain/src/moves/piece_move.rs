@@ -6,6 +6,8 @@ use crate::{
     pieces::{Piece, PieceKind, PromotionPiece},
 };
 
+use super::MoveRecord;
+
 #[derive(Debug, Clone, PartialEq, new)]
 pub struct Move {
     pub move_type: MoveType,
@@ -23,21 +25,13 @@ pub enum MoveType {
     Promotion(PromotionPiece),
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct MoveRecord {
-    pub mv: Move,
-    pub piece_moved: PieceKind,
-    pub piece_captured: Option<PieceKind>,
-    pub is_check: bool,
-}
-
 impl Move {
     // TODO: Implement a slimmer `.simulate()` method and make `.execute() consuming`
     pub fn execute(&self, board: &mut Board) -> MoveRecord {
         let mut piece = board[&self.from].expect("Invalid move: No piece at origin square");
         let current_player = piece.piece_color;
         let piece_moved = PieceKind::from(&piece.piece_type);
-        let piece_captured = board[&self.to].map(|piece| piece.piece_type.into());
+        let piece_captured = board[&self.to].map(|piece| PieceKind::from(&piece.piece_type));
 
         piece.has_moved = true;
 

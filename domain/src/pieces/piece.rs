@@ -1,12 +1,10 @@
-use std::fmt::Display;
-
 use crate::{
     board::{Board, Position},
     game::Color,
     moves::{Move, Moveable},
 };
 
-use super::{Bishop, King, Knight, Pawn, Queen, Rook};
+use super::PieceType;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Piece {
@@ -61,168 +59,12 @@ impl Moveable for Piece {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum PieceKind {
-    Pawn,
-    Knight,
-    Bishop,
-    Rook,
-    Queen,
-    King,
-}
-
-impl Display for PieceKind {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Pawn => write!(f, "{}", 'p'),
-            Self::Knight => write!(f, "{}", 'n'),
-            Self::Bishop => write!(f, "{}", 'b'),
-            Self::Rook => write!(f, "{}", 'r'),
-            Self::Queen => write!(f, "{}", 'q'),
-            Self::King => write!(f, "{}", 'k'),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Default)]
-pub enum PromotionPiece {
-    Knight,
-    Bishop,
-    Rook,
-    #[default]
-    Queen,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub enum PieceType {
-    Pawn(Pawn),
-    Bishop(Bishop),
-    Knight(Knight),
-    Rook(Rook),
-    Queen(Queen),
-    King(King),
-}
-
-impl PieceType {
-    pub fn as_index(&self) -> usize {
-        match self {
-            PieceType::Pawn(_) => 0,
-            PieceType::Knight(_) => 1,
-            PieceType::Bishop(_) => 2,
-            PieceType::Rook(_) => 3,
-            PieceType::Queen(_) => 4,
-            PieceType::King(_) => 5,
-        }
-    }
-}
-
-impl From<PieceType> for PieceKind {
-    fn from(value: PieceType) -> Self {
-        match value {
-            PieceType::Pawn(_) => Self::Pawn,
-            PieceType::Knight(_) => Self::Knight,
-            PieceType::Bishop(_) => Self::Bishop,
-            PieceType::Rook(_) => Self::Rook,
-            PieceType::Queen(_) => Self::Queen,
-            PieceType::King(_) => Self::King,
-        }
-    }
-}
-
-impl From<&PieceType> for PieceKind {
-    fn from(value: &PieceType) -> Self {
-        match value {
-            PieceType::Pawn(_) => Self::Pawn,
-            PieceType::Knight(_) => Self::Knight,
-            PieceType::Bishop(_) => Self::Bishop,
-            PieceType::Rook(_) => Self::Rook,
-            PieceType::Queen(_) => Self::Queen,
-            PieceType::King(_) => Self::King,
-        }
-    }
-}
-
-impl From<&PromotionPiece> for PieceType {
-    fn from(promotion_piece: &PromotionPiece) -> Self {
-        match promotion_piece {
-            PromotionPiece::Knight => Self::Knight(Knight),
-            PromotionPiece::Bishop => Self::Bishop(Bishop),
-            PromotionPiece::Rook => Self::Rook(Rook),
-            PromotionPiece::Queen => Self::Queen(Queen),
-        }
-    }
-}
-
-impl From<PieceType> for PromotionPiece {
-    fn from(value: PieceType) -> Self {
-        match value {
-            PieceType::Knight(_) => PromotionPiece::Knight,
-            PieceType::Bishop(_) => PromotionPiece::Bishop,
-            PieceType::Rook(_) => PromotionPiece::Rook,
-            _ => PromotionPiece::Queen,
-        }
-    }
-}
-
-impl PartialEq for PieceType {
-    fn eq(&self, other: &Self) -> bool {
-        matches!(
-            (self, other),
-            (PieceType::King(_), PieceType::King(_))
-                | (PieceType::Rook(_), PieceType::Rook(_))
-                | (PieceType::Bishop(_), PieceType::Bishop(_))
-                | (PieceType::Pawn(_), PieceType::Pawn(_))
-                | (PieceType::Queen(_), PieceType::Queen(_))
-                | (PieceType::Knight(_), PieceType::Knight(_))
-        )
-    }
-}
-
-pub struct PieceCounter {
-    white: [u8; 6],
-    black: [u8; 6],
-    total: u8,
-}
-
-impl Default for PieceCounter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl PieceCounter {
-    pub fn new() -> Self {
-        Self {
-            white: [0; 6],
-            black: [0; 6],
-            total: 0,
-        }
-    }
-
-    pub fn increment(&mut self, color: &Color, piece: &PieceType) {
-        match color {
-            Color::White => self.white[piece.as_index()] += 1,
-            Color::Black => self.black[piece.as_index()] += 1,
-        };
-        self.total += 1;
-    }
-
-    pub fn get_white(&self, piece: &PieceType) -> u8 {
-        self.white[piece.as_index()]
-    }
-
-    pub fn get_black(&self, piece: &PieceType) -> u8 {
-        self.black[piece.as_index()]
-    }
-
-    pub fn get_total(&self) -> u8 {
-        self.total
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::board::Direction;
+    use crate::{
+        board::Direction,
+        pieces::{Bishop, King, Knight, Pawn, Queen, Rook},
+    };
 
     use super::*;
 

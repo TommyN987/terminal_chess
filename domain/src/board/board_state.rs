@@ -57,15 +57,16 @@ impl Board {
             .collect()
     }
 
-    pub fn count_pieces(&self) -> PieceCounter {
-        self.piece_positions()
+    pub fn piece_positions(&self) -> Vec<Position> {
+        self.fields
             .iter()
-            .fold(PieceCounter::new(), |mut acc, pos| {
-                if let Some(piece) = self[pos] {
-                    acc.increment(&piece.piece_color, &piece.piece_type);
-                }
-                acc
+            .enumerate()
+            .flat_map(|(i, row)| {
+                row.iter()
+                    .enumerate()
+                    .filter_map(move |(j, cell)| cell.as_ref().map(|_| Position::from((i, j))))
             })
+            .collect()
     }
 
     pub fn get_en_passant_square(&self, player: &Color) -> Option<Position> {
@@ -96,18 +97,6 @@ impl Board {
 }
 
 impl Board {
-    fn piece_positions(&self) -> Vec<Position> {
-        self.fields
-            .iter()
-            .enumerate()
-            .flat_map(|(i, row)| {
-                row.iter()
-                    .enumerate()
-                    .filter_map(move |(j, cell)| cell.as_ref().map(|_| Position::from((i, j))))
-            })
-            .collect()
-    }
-
     fn init_starting_position() -> Self {
         let builder = BoardBuilder::new();
         builder

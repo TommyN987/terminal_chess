@@ -63,8 +63,10 @@ impl FenString {
 
     fn piece_char(piece: &Piece) -> String {
         match piece.piece_color {
-            Color::White => PieceKind::from(piece.piece_type).to_string().to_uppercase(),
-            Color::Black => PieceKind::from(piece.piece_type).to_string(),
+            Color::White => PieceKind::from(&piece.piece_type)
+                .to_string()
+                .to_uppercase(),
+            Color::Black => PieceKind::from(&piece.piece_type).to_string(),
         }
     }
 

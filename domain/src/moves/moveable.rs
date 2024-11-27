@@ -57,7 +57,7 @@ pub(crate) trait Moveable {
             .iter()
             .any(|m| {
                 board[&m.to].map_or(false, |piece| {
-                    PieceKind::from(piece.piece_type) == PieceKind::King
+                    PieceKind::from(&piece.piece_type) == PieceKind::King
                 })
             })
     }
