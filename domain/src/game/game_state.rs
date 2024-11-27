@@ -71,8 +71,8 @@ impl GameState {
             self.non_capture_or_pawn_move_counter += 1;
         }
         self.move_history.push(move_record);
-        self.update_fen_string();
         self.current_player = self.current_player.opponent();
+        self.update_fen_string();
         self.check_for_game_over();
     }
 
