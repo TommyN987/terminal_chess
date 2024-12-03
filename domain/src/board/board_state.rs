@@ -5,7 +5,7 @@ use derive_new::new;
 use crate::{
     game::{Color, Player},
     moves::{Move, Moveable},
-    pieces::{Piece, PieceCounter, PieceKind, PieceType},
+    pieces::{Piece, PieceKind, PieceType},
 };
 
 use super::{BoardBuilder, Position};

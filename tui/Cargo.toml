@@ -8,3 +8,4 @@ ratatui = "0.29.0"
 
 domain = { path = "../domain/", version = "*" }
 derive-new = { workspace = true }
+tokio = { workspace = true }

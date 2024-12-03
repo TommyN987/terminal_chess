@@ -9,3 +9,4 @@ resolver = "2"
 
 [workspace.dependencies]
 derive-new = "0.7.0"
+tokio = { version = "1.41.1", features = ["full"] }

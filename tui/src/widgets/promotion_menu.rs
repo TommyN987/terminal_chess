@@ -10,7 +10,7 @@ use ratatui::{
     widgets::{Block, Borders, StatefulWidget, Widget},
 };
 
-use super::piece::Piece;
+use super::{centered_rect, piece::Piece};
 
 #[derive(Debug, Clone)]
 pub struct PromotionMenu {
@@ -32,91 +32,69 @@ impl PromotionMenu {
             m,
         }
     }
+
+    pub fn next(&mut self) {
+        self.selected = (self.selected + 1) % self.pieces.len();
+    }
+
+    pub fn previous(&mut self) {
+        if self.selected > 0 {
+            self.selected -= 1;
+        } else {
+            self.selected = self.pieces.len() - 1;
+        }
+    }
 }
 
-impl StatefulWidget for PromotionMenu {
-    type State = usize;
-
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        // Define a vertical layout to center the promotion menu in the middle of the screen
-        let layout = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints(
-                [
-                    Constraint::Percentage(50),
-                    Constraint::Length(8),
-                    Constraint::Percentage(50),
-                ]
-                .as_ref(),
-            )
-            .split(area);
-
-        let middle_area = layout[1];
-
-        // Calculate the width of the menu area based on the width of the pieces
-        let piece_width = 13;
-        let total_menu_width = piece_width * self.pieces.len() as u16;
-
-        // Center the menu within middle_area
-        let menu_left_padding = (middle_area.width - total_menu_width) / 2;
-        let menu_area = Rect {
-            x: middle_area.x + menu_left_padding,
-            y: middle_area.y,
-            width: total_menu_width,
-            height: middle_area.height,
-        };
-
-        // Render the centered block with black background and borders around the whole widget
+impl Widget for PromotionMenu {
+    fn render(self, area: Rect, buf: &mut Buffer) {
         let block = Block::default()
             .style(Style::default().bg(Color::Black))
             .borders(Borders::ALL)
             .title("Promote")
             .title_alignment(Alignment::Center);
-        Widget::render(block, menu_area, buf);
 
-        // Define constraints to vertically center the pieces within the menu_area
-        // Adjust the length of the middle constraint to match the piece height more closely
-        let piece_layout = Layout::default()
+        let area = centered_rect(45, 40, area);
+
+        Widget::render(block, area, buf);
+
+        let inner_area_vertical = Layout::default()
             .direction(Direction::Vertical)
             .constraints(
                 [
-                    Constraint::Percentage(50),
-                    Constraint::Length(8),
-                    Constraint::Percentage(50),
+                    Constraint::Ratio(1, 3),
+                    Constraint::Ratio(1, 3),
+                    Constraint::Ratio(1, 3),
                 ]
                 .as_ref(),
             )
-            .split(menu_area);
+            .split(area);
 
-        let piece_area = piece_layout[1];
-
-        // Split piece_area horizontally to fit the pieces
-        let piece_areas = Layout::default()
+        let inner_area_horizontal = Layout::default()
             .direction(Direction::Horizontal)
             .constraints(
-                &(0..self.pieces.len())
-                    .map(|_| Constraint::Length(piece_width.into()))
-                    .collect::<Vec<_>>()[..],
+                [
+                    Constraint::Ratio(1, 4),
+                    Constraint::Ratio(1, 4),
+                    Constraint::Ratio(1, 4),
+                    Constraint::Ratio(1, 4),
+                ]
+                .as_ref(),
             )
-            .split(piece_area);
+            .split(inner_area_vertical[1]);
 
         // Render each piece, highlighting the selected one
         for (i, piece) in self.pieces.iter().enumerate() {
-            let mut area = piece_areas[i];
-            area.x += 1;
-            area.y += 1;
-            area.width = area.width.saturating_sub(1);
-            area.width = area.height.saturating_sub(1);
+            let area = inner_area_horizontal[i];
 
             // Apply highlighting if the piece is selected
-            if i == *state {
+            if i == self.selected {
                 let selected_style = Style::default().bg(Color::Yellow);
                 let selected_block = Block::default().style(selected_style);
 
                 Widget::render(selected_block, area, buf);
             }
 
-            // Render the piece in its area
             piece.clone().render(area, buf);
         }
     }

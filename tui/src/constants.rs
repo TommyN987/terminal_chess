@@ -9,8 +9,8 @@ pub const TITLE: &str = r#"
  ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
 "#;
 
-pub const WHITE: Color = Color::Rgb(160, 160, 160);
-pub const BLACK: Color = Color::Rgb(128, 95, 69);
+pub const WHITE: Color = Color::Rgb(194, 178, 128);
+pub const BLACK: Color = Color::Rgb(101, 67, 33);
 
 pub const BISHOP: &str = "\
     \n\

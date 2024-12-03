@@ -1,7 +1,7 @@
 use ratatui::crossterm::event::KeyEvent;
 
 use crate::{
-    app::{App, AppResult},
+    application::{App, AppResult},
     handlers::commands::CommandRegistry,
 };
 

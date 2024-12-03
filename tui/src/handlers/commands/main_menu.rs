@@ -1,6 +1,7 @@
 use derive_new::new;
+use domain::board::Direction;
 
-use crate::app::{App, AppResult, Direction};
+use crate::application::{App, AppResult, GameType};
 
 use super::Command;
 
@@ -11,7 +12,11 @@ pub(super) struct MainMenuNavigationCommand {
 
 impl Command for MainMenuNavigationCommand {
     fn execute(&self, state: &mut App) -> AppResult<()> {
-        state.move_menu_cursor(self.direction.clone());
+        match self.direction {
+            Direction::North => state.menu.next(),
+            Direction::South => state.menu.previous(),
+            _ => {}
+        }
         Ok(())
     }
 }
@@ -21,7 +26,7 @@ pub(super) struct MainMenuEnterCommand;
 
 impl Command for MainMenuEnterCommand {
     fn execute(&self, state: &mut App) -> AppResult<()> {
-        state.run();
+        state.start_game(GameType::default());
         Ok(())
     }
 }

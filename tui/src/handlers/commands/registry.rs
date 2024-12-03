@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
+use domain::board::Direction;
 use ratatui::crossterm::event::{KeyCode, KeyEvent};
-
-use crate::app::Direction;
 
 use super::{
     BackToMainMenuCommand, BoardEnterCommand, BoardNavigationCommand, Command, CommandBox,
@@ -51,11 +50,11 @@ impl CommandRegistry {
 
         registry.register(
             KeyEvent::from(KeyCode::Left),
-            PromotionMenuNavigationCommand::new(-1),
+            PromotionMenuNavigationCommand::new(Direction::West),
         );
         registry.register(
             KeyEvent::from(KeyCode::Right),
-            PromotionMenuNavigationCommand::new(1),
+            PromotionMenuNavigationCommand::new(Direction::East),
         );
 
         registry.register(KeyEvent::from(KeyCode::Enter), PromotionMenuEnterCommand);

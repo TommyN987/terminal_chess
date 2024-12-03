@@ -76,6 +76,10 @@ impl GameState {
         self.check_for_game_over();
     }
 
+    pub fn resign(&mut self) {
+        self.result = Some(GameResult::win(self.current_player.opponent()));
+    }
+
     pub fn is_game_over(&self) -> bool {
         self.result.is_some()
     }

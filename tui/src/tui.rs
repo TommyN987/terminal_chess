@@ -13,7 +13,7 @@ use std::{
 };
 
 use crate::{
-    app::{App, AppResult},
+    application::{App, AppResult},
     message_handler::MessageHandler,
 };
 
