@@ -1,7 +1,10 @@
-use domain::moves::{Move, MoveType};
+use domain::{
+    board::Direction,
+    moves::{Move, MoveType},
+};
 
 use crate::{
-    app::{App, AppResult, Direction, EventContext},
+    application::{App, AppResult, EventContext, Game},
     widgets::promotion_menu::PromotionMenu,
 };
 
@@ -18,9 +21,7 @@ impl BoardNavigationCommand {
 
 impl Command for BoardNavigationCommand {
     fn execute(&self, app: &mut App) -> AppResult<()> {
-        if app.game.view_state.promotion_menu.is_none() {
-            app.game.move_cursor(self.0.clone());
-        }
+        app.game.as_mut().map(|game| game.move_cursor(self.0));
         Ok(())
     }
 }
@@ -29,9 +30,11 @@ pub(super) struct BoardEnterCommand;
 
 impl Command for BoardEnterCommand {
     fn execute(&self, app: &mut App) -> AppResult<()> {
-        match app.game.view_state.selected_position {
-            None => app.game.select_piece(),
-            Some(_) => self.handle_piece_or_move(app)?,
+        if let Some(game) = app.game.as_mut() {
+            match game.view_state.selected_position {
+                None => game.select_piece(),
+                Some(_) => self.handle_piece_or_move(app)?,
+            }
         }
 
         Ok(())
@@ -40,24 +43,26 @@ impl Command for BoardEnterCommand {
 
 impl BoardEnterCommand {
     fn handle_piece_or_move(&self, app: &mut App) -> AppResult<()> {
-        let cursor_position = app.game.view_state.cursor_position;
+        if let Some(game) = app.game.as_mut() {
+            let cursor_position = game.view_state.cursor_position;
 
-        if let Some(piece) = app.game.game_state.board[&cursor_position] {
-            if app.game.game_state.current_player.color == piece.piece_color {
-                app.game.select_piece();
-                return Ok(());
+            if let Some(piece) = game.game_state.board[&cursor_position] {
+                if game.game_state.current_player.color == piece.piece_color {
+                    game.select_piece();
+                    return Ok(());
+                }
             }
-        }
 
-        if let Some(m) = self.find_move_to_cursor(app) {
-            if matches!(m.move_type, MoveType::Promotion(_)) {
-                self.open_promotion_menu(app, m)?;
-                app.event_context = EventContext::PromotionMenu;
-            } else {
-                app.game.game_state.make_move(m);
-                app.game.view_state.currently_legal_moves.clear();
-                if app.game.game_state.is_game_over() {
-                    app.event_context = EventContext::GameOver;
+            if let Some(m) = self.find_move_to_cursor(game) {
+                if matches!(m.move_type, MoveType::Promotion(_)) {
+                    self.open_promotion_menu(app, m)?;
+                    app.event_context = EventContext::PromotionMenu;
+                } else {
+                    game.game_state.make_move(m);
+                    game.view_state.currently_legal_moves.clear();
+                    if game.game_state.is_game_over() {
+                        app.event_context = EventContext::GameOver;
+                    }
                 }
             }
         }
@@ -65,10 +70,9 @@ impl BoardEnterCommand {
         Ok(())
     }
 
-    fn find_move_to_cursor(&self, app: &App) -> Option<Move> {
-        let cursor_position = app.game.view_state.cursor_position;
-        app.game
-            .view_state
+    fn find_move_to_cursor(&self, game: &Game) -> Option<Move> {
+        let cursor_position = game.view_state.cursor_position;
+        game.view_state
             .currently_legal_moves
             .iter()
             .find(|m| m.to == cursor_position)
@@ -76,10 +80,12 @@ impl BoardEnterCommand {
     }
 
     fn open_promotion_menu(&self, app: &mut App, promotion_move: Move) -> AppResult<()> {
-        app.game.view_state.promotion_menu = Some(PromotionMenu::new(
-            app.game.game_state.current_player.color,
-            promotion_move,
-        ));
+        app.game.as_mut().map(|game| {
+            game.promotion_menu = Some(PromotionMenu::new(
+                game.game_state.current_player.color,
+                promotion_move,
+            ))
+        });
         Ok(())
     }
 }

@@ -1,54 +1,61 @@
 use ratatui::{
-    buffer::Buffer,
     layout::{Alignment, Constraint, Direction, Flex, Layout, Rect},
     style::{Color, Modifier, Style},
     text::Text,
-    widgets::{Block, Borders, List, ListItem, Padding, Paragraph, StatefulWidget, Widget},
+    widgets::{Block, Borders, List, ListItem, Padding},
+    Frame,
 };
 
-use crate::{constants::TITLE, menu::Menu};
+use crate::widgets::AppTitle;
 
-pub struct AppTitle;
+pub const MENU_ITEMS: [&str; 4] = ["Human vs. Human", "Human vs. Engine", "Online Game", "Help"];
 
-impl Widget for AppTitle {
-    fn render(self, area: Rect, buf: &mut Buffer)
-    where
-        Self: Sized,
-    {
-        let lines: Vec<&str> = TITLE.trim().lines().collect();
-        let text_height = lines.len() as u16;
-        let vertical_offset = area.y + (area.height.saturating_sub(text_height)) / 2;
+#[derive(Debug, Clone)]
+pub struct Menu {
+    pub items: [&'static str; 4],
+    pub selected: usize,
+}
 
-        // Create a new Rect with the vertical offset
-        let centered_area = Rect {
-            x: area.x,
-            y: vertical_offset - 1,
-            width: area.width,
-            height: text_height + 1,
-        };
-
-        Paragraph::new(TITLE)
-            .alignment(Alignment::Center)
-            .block(Block::default())
-            .render(centered_area, buf);
+impl Default for Menu {
+    fn default() -> Self {
+        Self {
+            items: MENU_ITEMS,
+            selected: 0,
+        }
     }
 }
 
-impl StatefulWidget for Menu {
-    type State = usize;
+impl Menu {
+    pub fn next(&mut self) {
+        self.selected = (self.selected + 1) % self.items.len();
+    }
 
-    fn render(self, area: Rect, buf: &mut Buffer, state: &mut Self::State) {
+    pub fn previous(&mut self) {
+        if self.selected > 0 {
+            self.selected -= 1;
+        } else {
+            self.selected = self.items.len() - 1;
+        }
+    }
+
+    pub fn render_self(&self, frame: &mut Frame, main_area: Rect) {
         let layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([Constraint::Percentage(30), Constraint::Percentage(70)].as_ref())
+            .split(main_area);
+
+        let menu_layout = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([Constraint::Percentage(50)])
             .flex(Flex::Center)
-            .split(area);
+            .split(layout[1]);
+
         let list_items: Vec<ListItem> = self
             .items
             .iter()
             .enumerate()
             .map(|(i, &item)| {
-                if *state == i {
+                if self.selected == i {
                     ListItem::new(Text::from(format!("> {}", item)).alignment(Alignment::Center))
                         .style(
                             Style::default()
@@ -61,6 +68,7 @@ impl StatefulWidget for Menu {
                 }
             })
             .collect();
+
         let list = List::new(list_items)
             .block(
                 Block::default()
@@ -71,6 +79,7 @@ impl StatefulWidget for Menu {
             )
             .style(Style::default().fg(Color::White));
 
-        Widget::render(list, layout[0], buf);
+        frame.render_widget(AppTitle, layout[0]);
+        frame.render_widget(list, menu_layout[0]);
     }
 }

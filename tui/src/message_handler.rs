@@ -8,7 +8,7 @@ use std::{
 use ratatui::crossterm::event::{self, Event, KeyEvent, KeyEventKind, MouseEvent};
 
 use crate::{
-    app::{App, AppResult, EventContext},
+    application::{App, AppResult, EventContext},
     handlers::strategies::{
         GameHandler, GameOverHandler, KeyEventHandler, MainMenuHandler, PromotionMenuHandler,
     },

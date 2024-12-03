@@ -2,7 +2,7 @@ use crate::pieces::PieceType;
 
 use super::Color;
 
-pub struct PieceCounter {
+pub(super) struct PieceCounter {
     white: [u8; 6],
     black: [u8; 6],
     total: u8,

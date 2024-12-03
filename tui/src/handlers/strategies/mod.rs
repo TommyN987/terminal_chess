@@ -10,7 +10,7 @@ pub use promotion_menu::*;
 
 use ratatui::crossterm::event::KeyEvent;
 
-use crate::app::{App, AppResult};
+use crate::application::{App, AppResult};
 
 pub trait KeyEventHandler {
     fn handle_key_event(&self, key_event: KeyEvent, state: &mut App) -> AppResult<()>;

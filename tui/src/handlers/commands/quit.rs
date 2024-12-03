@@ -1,4 +1,4 @@
-use crate::app::{App, AppResult};
+use crate::application::{App, AppResult};
 
 use super::Command;
 

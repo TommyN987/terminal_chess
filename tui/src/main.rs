@@ -1,18 +1,17 @@
-use app::{App, AppResult};
+use application::{App, AppResult};
 use message_handler::{Message, MessageHandler};
 use ratatui::{backend::CrosstermBackend, Terminal};
 use tui::Tui;
 
-mod app;
+mod application;
 mod constants;
-mod game;
 mod handlers;
-mod menu;
 mod message_handler;
 mod tui;
 mod widgets;
 
-fn main() -> AppResult<()> {
+#[tokio::main]
+async fn main() -> AppResult<()> {
     let backend = CrosstermBackend::new(std::io::stderr());
     let terminal = Terminal::new(backend)?;
     let message_handler = MessageHandler::new(250);

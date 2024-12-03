@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::app::{App, AppResult};
+use crate::application::{App, AppResult};
 
 pub trait Command {
     fn execute(&self, state: &mut App) -> AppResult<()>;
