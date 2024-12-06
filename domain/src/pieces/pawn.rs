@@ -1,4 +1,5 @@
 use derive_new::new;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     board::{Board, Direction, Position},
@@ -8,7 +9,7 @@ use crate::{
 
 use super::{King, PieceType, PromotionPiece};
 
-#[derive(Debug, Clone, Copy, PartialEq, new)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, new)]
 pub struct Pawn {
     forward: Direction,
 }

@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 use derive_new::new;
@@ -10,13 +11,13 @@ use crate::{
 
 use super::{BoardBuilder, Position};
 
-#[derive(Debug, Default, Clone, PartialEq, new)]
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize, new)]
 pub(crate) struct EnPassantSquare {
     white: Option<Position>,
     black: Option<Position>,
 }
 
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Board {
     pub fields: [[Option<Piece>; 8]; 8],
     en_passant_square: EnPassantSquare,

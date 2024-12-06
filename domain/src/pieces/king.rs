@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{
     board::{Board, Direction, Position},
     game::{Color, Player},
@@ -6,7 +8,7 @@ use crate::{
 
 use super::PieceType;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct King;
 
 impl Moveable for King {

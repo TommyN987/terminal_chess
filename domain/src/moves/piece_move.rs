@@ -1,4 +1,5 @@
 use derive_new::new;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     board::{Board, Position},
@@ -8,14 +9,14 @@ use crate::{
 
 use super::MoveRecord;
 
-#[derive(Debug, Clone, PartialEq, new)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, new)]
 pub struct Move {
     pub move_type: MoveType,
     pub from: Position,
     pub to: Position,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum MoveType {
     Normal,
     ShortCastle,

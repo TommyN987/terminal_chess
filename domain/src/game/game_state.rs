@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use crate::{
@@ -8,7 +9,7 @@ use crate::{
 
 use super::{FenString, InsufficientMaterial, PieceCounter, Player};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GameState {
     pub board: Board,
     pub current_player: Player,
@@ -162,7 +163,7 @@ impl GameState {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum EndReason {
     Checkmate,
     Stalemate,
@@ -171,7 +172,7 @@ pub enum EndReason {
     ThreefoldRepetition,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GameResult {
     pub winner: Option<Player>,
     pub end_reason: EndReason,

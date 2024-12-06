@@ -3,10 +3,11 @@ use crate::{
     game::Color,
     moves::{Move, Moveable},
 };
+use serde::{Deserialize, Serialize};
 
 use super::PieceType;
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Piece {
     pub piece_type: PieceType,
     pub piece_color: Color,

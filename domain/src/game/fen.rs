@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{
     board::{Board, Direction, Position},
     moves::{Move, MoveType},
@@ -6,7 +8,7 @@ use crate::{
 
 use super::{Color, Player};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct FenString(String);
 
 impl FenString {
@@ -121,7 +123,7 @@ impl FenString {
 
         if let Some(pos) = board.get_en_passant_square(&player) {
             let rank = (8 - pos.row).to_string();
-            let file = ('a' as u8 + pos.column as u8) as char;
+            let file = (b'a' + pos.column as u8) as char;
             en_passant.push(file);
             en_passant.push_str(&rank);
         }

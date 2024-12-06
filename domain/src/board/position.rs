@@ -1,12 +1,13 @@
 use std::ops::{Add, AddAssign};
 
 use derive_new::new;
+use serde::{Deserialize, Serialize};
 
 use crate::game::Color;
 
 use super::Direction;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, new)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, new)]
 pub struct Position {
     pub row: i8,
     pub column: i8,

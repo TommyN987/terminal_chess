@@ -1,10 +1,12 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{
     board::{Board, Direction, Position},
     game::Color,
     moves::{Move, MoveType, Moveable},
 };
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Knight;
 
 impl Moveable for Knight {

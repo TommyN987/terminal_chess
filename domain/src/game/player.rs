@@ -1,6 +1,7 @@
 use derive_new::new;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, new)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, new)]
 pub struct Player {
     pub color: Color,
 }
@@ -26,7 +27,7 @@ impl Player {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum Color {
     White,
     Black,

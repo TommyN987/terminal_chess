@@ -1,8 +1,9 @@
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 use super::{Bishop, King, Knight, Pawn, Queen, Rook};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum PieceKind {
     Pawn,
     Knight,
@@ -15,17 +16,17 @@ pub enum PieceKind {
 impl Display for PieceKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Pawn => write!(f, "{}", 'p'),
-            Self::Knight => write!(f, "{}", 'n'),
-            Self::Bishop => write!(f, "{}", 'b'),
-            Self::Rook => write!(f, "{}", 'r'),
-            Self::Queen => write!(f, "{}", 'q'),
-            Self::King => write!(f, "{}", 'k'),
+            Self::Pawn => write!(f, "p"),
+            Self::Knight => write!(f, "n"),
+            Self::Bishop => write!(f, "b"),
+            Self::Rook => write!(f, "r"),
+            Self::Queen => write!(f, "q"),
+            Self::King => write!(f, "k"),
         }
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub enum PromotionPiece {
     Knight,
     Bishop,
@@ -49,7 +50,7 @@ impl Display for PromotionPiece {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum PieceType {
     Pawn(Pawn),
     Bishop(Bishop),

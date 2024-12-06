@@ -1,10 +1,11 @@
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 use crate::{board::Position, pieces::PieceKind};
 
 use super::{Move, MoveType};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MoveRecord {
     pub mv: Move,
     pub piece_moved: PieceKind,
@@ -18,7 +19,7 @@ impl Display for MoveRecord {
             MoveType::ShortCastle => write!(f, "0-0"),
             MoveType::LongCastle => write!(f, "0-0-0"),
             MoveType::Promotion(piece) => {
-                write!(f, "{}={}", self.pgn_preprocess(), piece.to_string())
+                write!(f, "{}={}", self.pgn_preprocess(), piece)
             }
             _ => write!(f, "{}", self.pgn_preprocess()),
         }
@@ -34,7 +35,7 @@ impl MoveRecord {
 
         let Position { row, column } = self.mv.to;
         let rank = 8 - row;
-        let file = ('a' as u8 + column as u8) as char;
+        let file = (b'a' + column as u8) as char;
 
         format!(
             "{}{}{}{}",
