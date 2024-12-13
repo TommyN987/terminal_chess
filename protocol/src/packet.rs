@@ -13,7 +13,12 @@ pub enum Encoding {
 #[derive(Debug, Clone, Copy)]
 pub enum PacketType {
     Error,
-    Message,
+    GameRequest,
+    MovePiece,
+    Resign,
+    DrawOffer,
+    DrawOfferAccept,
+    DrawOfferReject,
     CloseConnection,
 }
 
@@ -134,8 +139,13 @@ impl From<u8> for PacketType {
     fn from(value: u8) -> Self {
         match value {
             0 => PacketType::Error,
-            1 => PacketType::Message,
-            2 => PacketType::CloseConnection,
+            1 => PacketType::GameRequest,
+            2 => PacketType::MovePiece,
+            3 => PacketType::Resign,
+            4 => PacketType::DrawOffer,
+            5 => PacketType::DrawOfferAccept,
+            6 => PacketType::DrawOfferReject,
+            7 => PacketType::CloseConnection,
             _ => PacketType::Error,
         }
     }
