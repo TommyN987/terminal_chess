@@ -1,3 +1,5 @@
+use strum::EnumIter;
+
 use crate::{
     constants::{HEADER_LENGTH_OFFSET, HEADER_SIZE, PACKET_MAX_SIZE, TYPE_ENC_INDEX, VERSION},
     error::ProtocolError,
@@ -10,7 +12,7 @@ pub enum Encoding {
     Bytes,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum PacketType {
     Error,
     GameRequest,

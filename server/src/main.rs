@@ -1,16 +1,17 @@
-use std::net::SocketAddr;
+use std::{net::SocketAddr, sync::Arc};
 
-use ids::PlayerId;
-use matchmaker::{GameRequest, Matchmaker};
-use protocol::packet::{PacketFramer, PacketType};
+use global_state::GlobalState;
+use handlers::HandlerRegistry;
+use matchmaker::Matchmaker;
+use protocol::packet::PacketFramer;
 use tokio::{
     io::AsyncReadExt,
     net::{TcpListener, TcpStream},
     sync::mpsc,
 };
-use uuid::Uuid;
 
-mod game;
+mod global_state;
+mod handlers;
 mod ids;
 mod matchmaker;
 
@@ -21,27 +22,32 @@ async fn main() {
         .await
         .expect("Failed to bind to address");
 
+    let global_state = Arc::new(GlobalState::default());
+
     let (matchmaker_tx, matchmaker_rx) = mpsc::channel(100);
-    let mut matchmaker = Matchmaker::new(matchmaker_rx);
-    tokio::spawn(async move { matchmaker.run().await });
+
+    *global_state.matchmaker.write().await = Some(matchmaker_tx.clone());
+
+    tokio::spawn(async move {
+        let mut matchmaker = Matchmaker::new(matchmaker_rx);
+        matchmaker.run().await
+    });
 
     println!("Server running on {}", addr);
 
     while let Ok((socket, addr)) = listener.accept().await {
         println!("New connection: {}", addr);
-        tokio::spawn(handle_client(socket, addr, matchmaker_tx.clone()));
+        tokio::spawn(handle_client(socket, addr, Arc::clone(&global_state)));
     }
 }
 
-async fn handle_client(
-    mut socket: TcpStream,
-    addr: SocketAddr,
-    matchmaker_tx: mpsc::Sender<GameRequest>,
-) {
+async fn handle_client(mut socket: TcpStream, addr: SocketAddr, global_state: Arc<GlobalState>) {
     println!("Handling client: {}", addr);
 
     let mut framer = PacketFramer::new();
     let mut buffer = [0; 1024];
+
+    let handler_registry = HandlerRegistry::new();
 
     loop {
         match socket.read(&mut buffer).await {
@@ -50,9 +56,13 @@ async fn handle_client(
                 break;
             }
             Ok(n) => {
-                if let Err(err) = process_data(&mut framer, &buffer[..n], &matchmaker_tx).await {
-                    eprintln!("Error processing data from {}: {}", addr, err);
-                    break;
+                if let Some(packet) = framer.push(&buffer[..n]).ok().flatten() {
+                    if let Err(err) = handler_registry
+                        .process_packet(packet, Arc::clone(&global_state))
+                        .await
+                    {
+                        eprintln!("Error processing packet from {}: {}", addr, err);
+                    }
                 }
             }
             Err(e) => {
@@ -61,40 +71,4 @@ async fn handle_client(
             }
         }
     }
-}
-
-async fn process_data(
-    framer: &mut PacketFramer,
-    data: &[u8],
-    matchmaker_tx: &mpsc::Sender<GameRequest>,
-) -> Result<(), String> {
-    if let Some(packet) = framer.push(data).map_err(|e| e.to_string())? {
-        match packet.packet_type() {
-            PacketType::GameRequest => {
-                println!("Received a game request.");
-                let payload = packet.payload();
-
-                let player_id = Uuid::from_slice(payload)
-                    .map_err(|e| format!("Failed to parse Uuid from payload: {}", e))?;
-
-                let request = GameRequest {
-                    player_id: PlayerId::from(player_id),
-                };
-
-                matchmaker_tx
-                    .send(request)
-                    .await
-                    .map_err(|e| format!("Failed to send to matchmaker: {}", e))?;
-            }
-            PacketType::MovePiece => {
-                println!("Received a move.");
-                todo!()
-            }
-            _ => {
-                println!("Unhandled packet type.");
-                todo!()
-            }
-        }
-    }
-    Ok(())
 }

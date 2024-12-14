@@ -8,7 +8,9 @@ members = [
 resolver = "2"
 
 [workspace.dependencies]
+bincode = "2"
 derive-new = "0.7.0"
 serde = { version = "1.0.215", features = ["derive"] }
+strum = { version = "0.26", features = ["derive"] }
 tokio = { version = "1.41.1", features = ["full"] }
 uuid = { version = "1.11.0", features = ["v4"] }
