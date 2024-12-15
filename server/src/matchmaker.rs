@@ -1,8 +1,13 @@
-use std::collections::VecDeque;
+use std::{collections::VecDeque, sync::Arc};
 
 use tokio::sync::mpsc;
+use uuid::Uuid;
 
-use crate::ids::PlayerId;
+use crate::{
+    game_session::GameSession,
+    global_state::GlobalState,
+    ids::{GameId, PlayerId},
+};
 
 #[derive(Debug)]
 pub struct GameRequest {
@@ -22,24 +27,39 @@ impl Matchmaker {
         }
     }
 
-    pub async fn run(&mut self) {
+    pub async fn run(&mut self, global_state: Arc<GlobalState>) {
         while let Some(request) = self.rx.recv().await {
             println!("Received game request: {:?}", request);
 
             if let Some(opponent) = self.pending.pop_front() {
                 println!("Matched {:?} with {:?}", opponent, request);
-                self.start_game(opponent, request).await;
+                self.start_game(opponent, request, Arc::clone(&global_state))
+                    .await;
             } else {
                 self.pending.push_back(request);
             }
         }
     }
 
-    async fn start_game(&self, player_1: GameRequest, player_2: GameRequest) {
+    async fn start_game(
+        &self,
+        player_1: GameRequest,
+        player_2: GameRequest,
+        global_state: Arc<GlobalState>,
+    ) {
+        let game_id = GameId::from(Uuid::new_v4());
+
         println!(
-            "Starting game between {:?} and {:?}",
-            player_1.player_id, player_2.player_id
+            "Starting game between {:?} and {:?} with game ID: {:?}",
+            player_1.player_id, player_2.player_id, game_id
         );
-        // TODO: Implement game initialization and state management
+
+        let session = GameSession::new(player_1.player_id, player_2.player_id);
+
+        global_state
+            .active_games
+            .write()
+            .await
+            .insert(game_id, session);
     }
 }

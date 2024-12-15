@@ -3,7 +3,7 @@ use strum::IntoEnumIterator;
 
 use protocol::packet::{Packet, PacketType};
 
-use crate::global_state::GlobalState;
+use crate::{global_state::GlobalState, ids::PlayerId};
 
 use super::{game_request::GameRequestHandler, PacketHandler};
 
@@ -32,9 +32,10 @@ impl HandlerRegistry {
         &self,
         packet: Packet,
         global_state: Arc<GlobalState>,
+        player_id: &PlayerId,
     ) -> Result<(), String> {
         if let Some(handler) = self.handlers.get(&packet.packet_type()) {
-            handler.handle(packet, global_state).await
+            handler.handle(packet, global_state, player_id).await
         } else {
             Err(format!(
                 "No handler registered for packet type: {:?}",
